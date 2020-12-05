@@ -15,22 +15,26 @@ type SmartContract struct {
 
 //Food describes basic details of what makes up a food
 type Postulacion struct {
-	Rut  string `json:"rut"`
 	Llamado int `json:"llamado"`
-	Puntaje string `json:"puntaje"`
-	Estado string `json:"estado"`}
+	Rut  string `json:"rut"`
+	Puntaje float32 `json:"puntaje"`
+	Monto float32`json:"monto"`
+	Estado string `json:"estado"`
+	Usuario string `json:"usuario"`}
 
-func (s *SmartContract) Set(ctx contractapi.TransactionContextInterface, postulacionId string, rut string,llamado int, puntaje string, estado string) error {
+func (s *SmartContract) Set(ctx contractapi.TransactionContextInterface, postulacionId string, rut string,llamado int, puntaje float32,monto float32, estado string, usuario string) error {
 
 	//Validaciones de sintaxis
 
 	//validaciones de negocio
 
 	postulacion := Postulacion{
-		Rut:  rut,
 		Llamado:  llamado,
+		Rut:  rut,
 		Puntaje: puntaje,
-		Estado: estado,}
+		Monto: monto,
+		Estado: estado,
+		Usuario: usuario,}
 
 
 	postulacionAsBytes, err := json.Marshal(postulacion)

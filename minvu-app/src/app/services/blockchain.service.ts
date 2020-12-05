@@ -1,47 +1,77 @@
 import { Injectable } from '@angular/core';
-import { StringDecoder } from 'string_decoder';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { PostulacionModel } from '../models/postulacion.model';
+import {map} from 'rxjs/operators';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
+
 export class BlockchainService {
 
+    private url = 'http://localhost:5985/postulacion_minvucontrol/';
+    private httpOptions = {
+        headers: new HttpHeaders({
+            'Authorization': `Basic YWRtaW46YWRtaW5wdw==`,
+            'Content-Type': `application/json`
+        })
+    };
 
-    private listadoPostulaciones:Postulacion[] = [
-        {
-            "_id": "did:3",
-            "_rev": "2-5ca2edb327133b4c8c460d07fe483a41",
-            "puntaje": "103",
-            "rut": "17694197",
-            "monto": 2000,
-            "estado":1,
-            "version": "CgMBCAA=",
-        },
-        {
-            "_id": "did:4",
-            "_rev": "2-5ca2edb327133b4c8c460d07fe483a41",
-            "puntaje": "103",
-            "rut": "10528930",
-            "monto": 1300,
-            "estado":2,
-            "version": "CgMBCAA="
+    constructor(private http: HttpClient){}
+
+    crearPostulacionesBlockchain(postulacion: PostulacionModel){
+        return this.http.post(`${ this.url}`, postulacion, this.httpOptions)
+            .pipe(
+                map( (resp: any) => {
+                    postulacion._id = resp.id;
+                    postulacion._rev = resp.rev;
+                })
+            );
+    }
+
+    ActualizarPostulacionBlockchain(postulacion: PostulacionModel){
+
+        const postulacionTemp = {...postulacion};
+        delete postulacionTemp._id;
+
+        return this.http.put(`${ this.url + postulacion._id}`, postulacionTemp, this.httpOptions)
+        .pipe(
+            map( (resp: any) => {
+                postulacion._rev = resp.rev;
+            })
+        );
+    }
+
+    ObtenerPostulaciones(){
+        return this.http.get(`${ this.url + '_all_docs?include_docs=true'}`, this.httpOptions)
+            .pipe(
+                map(resp => this.crearArreglo(resp))
+            );
+    }
+
+    ObtenerPostulacion(id: string){
+        return this.http.get(`${ this.url + id}`, this.httpOptions);
+    }
+
+    private crearArreglo(postulacionObj: object){
+        const postulaciones: PostulacionModel[] = [];
+
+        if (postulacionObj === null ){
+            return [];
         }
-    ];
 
-    constructor(){
-        console.log("Servicio listoco");
+        for (let i in postulacionObj){
+            for (let j in postulacionObj[i]){
+                postulaciones.push(postulacionObj[i][j].doc);
+            }
+        }
+
+        return postulaciones;
     }
 
-    getPostulacionesBlockchain():Postulacion[]{
-        return this.listadoPostulaciones;
+    EliminarPostulacion(postulacion: PostulacionModel){
+        const postulacionTemp = {...postulacion};
+        delete postulacionTemp._id;
+        return this.http.delete(`${ this.url + postulacion._rev}`, this.httpOptions);
     }
-}
-
-export interface Postulacion{
-    _id: string;
-    _rev: string;
-    puntaje: string;
-    rut: string;
-    estado: number;
-    monto: number;
-    version: string;
-    
 }

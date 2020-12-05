@@ -5,61 +5,7 @@
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a class="nav-link active" href="#">
-                            <span data-feather="home"></span> Dashboard <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" routerLinkActive="active">
-                        <a class="nav-link" [routerLink]="['detallePostulacion']">
-                            <span data-feather="file"></span> detalle
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="shopping-cart"></span> Products
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="users"></span> Customers
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="bar-chart-2"></span> Reports
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="layers"></span> Integrations
-                        </a>
-                    </li>
-                </ul>
-
-                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                    <span>Saved reports</span>
-                    <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
-                        <span data-feather="plus-circle"></span>
-                    </a>
-                </h6>
-                <ul class="nav flex-column mb-2">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file-text"></span> Current month
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file-text"></span> Last quarter
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file-text"></span> Social engagement
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file-text"></span> Year-end sale
+                            <span data-feather="home"></span> Listado postulaciones <span class="sr-only">(current)</span>
                         </a>
                     </li>
                 </ul>
@@ -68,7 +14,7 @@
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Dashboard</h1>
+                <h1 class="h2">Listado postulaciones</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group mr-2">
                         <button type="button" class="btn btn-sm btn-primary" routerLink="/detallePostulacion/nuevo">
@@ -87,35 +33,51 @@
                 <div class="row">
                     <div class="col-sm">
                         <div class="table-responsive">
-                            <table class="table mt-3 table-striped table-sm">
+                            <table *ngIf="!cargando && postulaciones.length > 0" class="table mt-3 table-striped table-sm animated fadeIn faster">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th>ID</th>
+                                        <th>REV</th>
                                         <th>Llamado</th>
                                         <th>RUT</th>
                                         <th>Puntaje</th>
-                                        <th>Monto (UF</th>
+                                        <th>Monto (UF)</th>
                                         <th>Estado</th>
                                         <th>Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody *ngFor="let postulacion of listadoPostulaciones">
+
+                                <tbody *ngFor="let postulacion of postulaciones; let i = index">
                                     <tr>
                                         <td>{{postulacion._id}}</td>
                                         <td>{{postulacion._rev}}</td>
+                                        <td>{{postulacion.llamado}}</td>
                                         <td>{{postulacion.rut}}</td>
                                         <td>{{postulacion.puntaje}}</td>
                                         <td>{{postulacion.monto}}</td>
-                                        <td>{{postulacion.estado}}</td>
-                                        <th><button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#PostulacionModal" data-whatever="@mdo">Ingresar</button></th>
+                                        <td>
+                                            <label *ngIf="postulacion.estado == 1" class="badge badge-primary">Ingresado</label>
+                                            <label *ngIf="postulacion.estado == 2" class="badge badge-info">Aprobado</label>
+                                            <label *ngIf="postulacion.estado == 3" class="badge badge-success">Seleccionado</label>
+                                        </td>
+                                        <th>
+                                            <button type="button" class="btn btn-info mr-1" [routerLink]="['/detallePostulacion',postulacion._id]">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
+                                            <!-- <button type="button" class="btn btn-danger" (click)="EliminarPostulacion(postulacion,i)">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        -->
+                                        </th>
                                     </tr>
                                 </tbody>
+
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <div class="alert alert-info text-center mt-3" role="alert">
+                <div *ngIf="cargando" class="alert alert-info text-center mt-3 animated fadeIn faster" role="alert">
                     <h4 class="alert-heading">Cargando ...</h4>
                     <p>
                         <i class="fa fa-sync-alt fa-spin fa-2px"></i>
@@ -124,7 +86,7 @@
                         Espere por favor.
                     </p>
                 </div>
-                <div class="alert alert-warning text-center mt-3" role="alert">
+                <div *ngIf="!cargando && postulaciones.length === 0" class="alert alert-warning text-center mt-3 animated fadeIn faster" role="alert">
                     <h4 class="alert-heading">No hay registros</h4>
                     <p>
                         <i class="fa fa-exclamation fa-2x"></i>

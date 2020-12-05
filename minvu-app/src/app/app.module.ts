@@ -4,6 +4,8 @@ import { NgModule } from '@angular/core';
 // Rutas
 import {APP_ROUTING} from './app.routes';
 import {FormsModule} from '@angular/forms';
+import { HttpClientModule} from '@angular/common/http';
+
 
 // Servicios
 import {BlockchainService} from './services/blockchain.service';
@@ -27,7 +29,8 @@ import {DetallePostulacionComponent} from './components/detallePostulacion/detal
   imports: [
     BrowserModule,
     APP_ROUTING,
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ],
   providers: [
   BlockchainService

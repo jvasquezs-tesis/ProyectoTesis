@@ -34,8 +34,8 @@
                             "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
                             "node_modules/popper.js/dist/umd/popper.min.js",
                             "node_modules/bootstrap/dist/js/bootstrap.min.js",
-                            "./src/assets/libs/js/validaciones.js",
-                            "./src/assets/libs/js/dashboard.js"
+                            "./src/assets/libs/js/validaciones.js"
+                            //"./src/assets/libs/js/dashboard.js"
                         ]
                     },
                     "configurations": {

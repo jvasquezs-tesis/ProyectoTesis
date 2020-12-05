@@ -5,61 +5,7 @@
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a class="nav-link active" href="#">
-                            <span data-feather="home"></span> Dashboard <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" routerLinkActive="active">
-                        <a class="nav-link" [routerLink]="['detallePostulacion']">
-                            <span data-feather="file"></span> detalle
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="shopping-cart"></span> Products
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="users"></span> Customers
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="bar-chart-2"></span> Reports
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="layers"></span> Integrations
-                        </a>
-                    </li>
-                </ul>
-
-                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                    <span>Saved reports</span>
-                    <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
-                        <span data-feather="plus-circle"></span>
-                    </a>
-                </h6>
-                <ul class="nav flex-column mb-2">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file-text"></span> Current month
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file-text"></span> Last quarter
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file-text"></span> Social engagement
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file-text"></span> Year-end sale
+                            <span data-feather="home"></span> Listado postulaciones<span class="sr-only">(current)</span>
                         </a>
                     </li>
                 </ul>
@@ -72,56 +18,93 @@
 
             </div>
 
+            <div class="form-group text-right">
+                <div class="col">
+                    <button class="btn btn-danger" [routerLink]="['/home']">
+                        <i class="fa fa-arrow-left"></i>
+                        Regresar
+                    </button>
+                </div>
+            </div>
             <div class="container">
                 <form (ngSubmit)="guardar(f)" #f="ngForm" class="needs-validation" novalidate>
-                    <div class="form-row">
-                        <div class="col-md-4 mb-3">
-                            <label for="validationCustom01">Llamado</label>
-                            <input type="text" class="form-control" id="validationCustom01" value="3333" [(ngModel)]="detallePostulacion._id" name="id" required disabled>
+                    <div class="form-group">
+                        <div class="col">
+                            <label for="validationCustom01">ID</label>
+                            <input type="text" class="form-control" id="validationCustom01" [(ngModel)]="postulacion._id" name="_id" required disabled>
+                            <!--<div class="invalid-feedback">
+                                Ingrese un Llamado
+                            </div>-->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col">
+                            <label for="validationCustom02">REV</label>
+                            <input type="text" class="form-control" id="validationCustom02" [(ngModel)]="postulacion._rev" name="_rev" required disabled>
+                            <!--<div class="invalid-feedback">
+                                Ingrese un Llamado
+                            </div>-->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col">
+                            <label for="validationCustom03">N° Llamado</label>
+                            <input type="text" class="form-control" id="validationCustom03" [(ngModel)]="postulacion.llamado" name="llamado" placeholder="3180" required>
                             <div class="invalid-feedback">
                                 Ingrese un Llamado
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="validationCustom02">RUT</label>
-                            <input type="text" class="form-control" id="validationCustom02" [(ngModel)]="detallePostulacion.rut" name="rut" placeholder="11555888-9" required>
+                    </div>
+                    <div class="form-group">
+                        <div class="col">
+                            <label for="validationCustom04">RUT</label>
+
+                            <input type="text" class="form-control" id="validationCustom04" [(ngModel)]="postulacion.rut" name="rut" placeholder="11555888-9" required>
                             <div class="invalid-feedback">
                                 Ingrese un RUT
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="validationCustom03">Puntaje</label>
-                            <input type="text" class="form-control" id="validationCustom03" [(ngModel)]="detallePostulacion.puntaje" name="puntaje" placeholder="100" required>
+                    </div>
+                    <!---</div>
+                    <div class="form-row">-->
+                    <div class="form-group">
+                        <div class="col">
+                            <label for="validationCustom05">Puntaje</label>
+                            <input type="text" class="form-control" id="validationCustom05" [(ngModel)]="postulacion.puntaje" name="puntaje" placeholder="100" required>
                             <div class="invalid-feedback">
                                 Ingrese un puntaje
                             </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="col-md-3 mb-3">
-                            <label for="validationCustom04">Monto en UF</label>
-                            <input type="text" class="form-control" id="validationCustom04" [(ngModel)]="detallePostulacion.monto" name="monto" placeholder="1600" required>
+                    <div class="form-group">
+                        <div class="col">
+                            <label for="validationCustom06">Monto en UF</label>
+                            <input type="text" class="form-control" id="validationCustom06" [(ngModel)]="postulacion.monto" name="monto" placeholder="1600" required>
                             <div class="invalid-feedback">
                                 Ingrese un monto.
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="validationCustom05">Estado</label>
-                            <select class="custom-select" id="validationCustom05" [(ngModel)]="detallePostulacion.estado" name="estado" required>
-                          <option selected disabled value="">Selecciones una opción</option>
-                          <option value ="1">Ingresar Postulación</option>
-                          <option value ="2">Aprobar</option>
-                          <option value ="3">Seleccionar</option>
-                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="col">
+                            <label for="validationCustom07">Estado</label>
+                            <select class="custom-select" id="validationCustom07" [(ngModel)]="postulacion.estado" name="estado" required>
+                            <option selected disabled value="">Selecciones una opción</option>
+                            <option value ="1">Ingresar Postulación</option>
+                            <option value ="2">Aprobar</option>
+                            <option value ="3">Seleccionar</option>
+                            </select>
                             <div class="invalid-feedback">
                                 Seleccione un estado.
                             </div>
                         </div>
                     </div>
-                    <div class="form-group text-center">
-                        <button class="btn btn-primary" type="submit">
-                        <i class="fa fa-save"></i>
-                        Guardar</button>
+                    <div class="form-group">
+                        <div class="form-group text-center">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fa fa-save"></i>
+                                Guardar</button>
+                        </div>
                     </div>
                 </form>
             </div>
