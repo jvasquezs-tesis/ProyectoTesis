@@ -2,10 +2,60 @@ TRAZABILIDAD DE POSTULACIÓN.
 
 ___________________________________________________________________________________________________________________________________________________
 
+REQUISITOS PREVIOS SOBRE SISTEMA OPERATIVO UBUNTU VERSIÓN 20.04.1 LTS
+
+-Instalar Visual Studio Code Versión 1.50.1
+  sudo snap install --classic code 
+
+-Instalar curl
+  sudo apt install curl
+
+-Instalar docker
+  sudo apt install docker 
+
+ 
+-Instalar docker-compose
+   sudo apt install docker-compose
+
+-Configurar servicio docker
+  sudo systemctl enable docker
+  
+-Configurar usuario docker
+  sudo usermod -aG docker ${USER}
+
+-Realizar la instalación de Golang de debe ir al sitio oficial https://golang.org/dl/ y descargar la versión para Linux.
+-Descomprimir go tar.gz
+  sudo tar -xvf go1.15.3.linux-amd64.tar.gz
+-Mover GO a carpeta de sistema
+  sudo mv go /usr/local
+-Agregar configuraciones en profile
+  sudo nano ~/.profile
+ -Lineas a agregar en archivo
+  export GOROOT=/usr/local/go
+  export GOPATH=$HOME/go
+  export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
+-Configurar archivos git
+  git config --global core.autocrlf false
+  git config --global core.longpaths true
+  
+-Crear carpeta
+  mkdir ProyectoTesis
+
+-Clonar muestras hyperledger en la carpeta ProyectoTesis
+  curl -sSL https://bit.ly/2ysbOFE | bash -s
+
+
+-Configurar variable de entorno.
+  echo 'export PATH=$PATH:$HOME/ProyectoTesis/fabric-samples/bin'>> ~/.profile
+  source ~/.profile
+
+
+___________________________________________________________________________________________________________________________________________________
+
 CONFIGURACIÓN Y EJECUCIÒN DE LA RED HYPERLEDGER FABRIC
 
-Configurar variable de entorno.
-  echo 'export PATH=$PATH:$HOME/ProyectoTesis/fabric-samples/bin'>> ~/.profile
+
 
 MATERIAL CRIPTOGRAFICO.
 
