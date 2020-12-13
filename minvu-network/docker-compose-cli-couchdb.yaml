@@ -145,6 +145,7 @@ services:
     environment:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=adminpw
+      
     ports: 
       - 5984:5984
     container_name: couchdb0

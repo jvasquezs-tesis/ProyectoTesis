@@ -117,8 +117,8 @@
                 Rule: "MAJORITY Admins"
             LifecycleEndorsement:
                 Type: ImplicitMeta
-                Rule: "MAJORITY Endorsement"
-            Endorsement:
+                Rule: "MAJORITY Endorsement" ## ALL todos las organizaciones firman un despliegue del chaincode.
+            Endorsement:     ## transacciones del chaincode , una transaccon debe ser aprobada por la mayoria de los nodos
                 Type: ImplicitMeta
                 Rule: "MAJORITY Endorsement"
     
