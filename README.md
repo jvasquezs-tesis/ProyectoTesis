@@ -235,3 +235,28 @@ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypt
 ```shell
 CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.minvu.cl/users/Admin@org3.minvu.cl/msp CORE_PEER_ADDRESS=peer0.org3.minvu.cl:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.minvu.cl/peers/peer0.org3.minvu.cl/tls/ca.crt peer chaincode invoke -o orderer.minvu.cl:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","5","176941979","3180","55","1300","Ingresado","serviu"]}'
 ```
+
+
+Automatizar creación de la red hyperledger 
+
+Quitar udo de criptogen con el fin de hacer el ejemplo mas realista.
+
+
+
+Permite utilizar terminal para conectarnos al cli sin necesidad de utilizar el cli container 
+1.- prerequisites.sh 
+
+2.- 
+
+artifacts.sh --- > contiene la configuracion del archivo configtx.yaml 
+
+channel.sh
+cleancerts.sh
+down.sh
+identities.sh
+intca.sh
+msp.sh
+
+rootca.sh
+up.sh
+
