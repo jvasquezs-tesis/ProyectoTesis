@@ -236,27 +236,36 @@ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypt
 CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.minvu.cl/users/Admin@org3.minvu.cl/msp CORE_PEER_ADDRESS=peer0.org3.minvu.cl:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.minvu.cl/peers/peer0.org3.minvu.cl/tls/ca.crt peer chaincode invoke -o orderer.minvu.cl:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","5","176941979","3180","55","1300","Ingresado","serviu"]}'
 ```
 
+----------------
+COFIGURACION DE CERTIFICADOS EN LA RED 
+---------------
 
-Automatizar creación de la red hyperledger 
+Crear root CA. o CA Raiz
 
-Quitar udo de criptogen con el fin de hacer el ejemplo mas realista.
+´´´shell
+docker-compose -f docker-compose-root-ca.yaml up -d
+´´´
+Creamos intermedies CA a traves de los script 
+´´´shell
+cd scripts/ && ./rootca.sh
+´´´
 
+´´´shell
+docker-compose -f docker-compose-int-ca.yaml up -d
+´´´
 
+´´´shell
+cd scripts/ && ./intca.sh
+´´´
 
-Permite utilizar terminal para conectarnos al cli sin necesidad de utilizar el cli container 
-1.- prerequisites.sh 
+´´´shell
+export CSR_NAMES_ORG1="C=CO,ST=Antioquia,L=Medellin,O=Org1,OU=Hyperledger Fabric" 
+export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin
+fabric-ca-client register --id.name admin2@org1.minvu.cl --id.secret admin2pw --id.type admin -u http://admin:adminpw@localhost:7056
+export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin2@org1.minvu.cl
+fabric-ca-client enroll -u http://admin2@org1.minvu.cl:admin2pw@localhost:7056 --csr.names "$CSR_NAMES_ORG1"
+export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/tls-int/clients/admin
+fabric-ca-client register --id.name admin2@org1.minvu.cl --id.secret admin2pw --id.type admin -u http://admin:adminpw@localhost:7057
 
-2.- 
-
-artifacts.sh --- > contiene la configuracion del archivo configtx.yaml 
-
-channel.sh
-cleancerts.sh
-down.sh
-identities.sh
-intca.sh
-msp.sh
-
-rootca.sh
-up.sh
+´´´
 
