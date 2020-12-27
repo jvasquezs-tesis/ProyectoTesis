@@ -259,13 +259,49 @@ cd scripts/ && ./intca.sh
 ´´´
 
 ´´´shell
+
 export CSR_NAMES_ORG1="C=CO,ST=Antioquia,L=Medellin,O=Org1,OU=Hyperledger Fabric" 
+
 export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin
+
 fabric-ca-client register --id.name admin2@org1.minvu.cl --id.secret admin2pw --id.type admin -u http://admin:adminpw@localhost:7056
+
 export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin2@org1.minvu.cl
+
 fabric-ca-client enroll -u http://admin2@org1.minvu.cl:admin2pw@localhost:7056 --csr.names "$CSR_NAMES_ORG1"
+
 export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/tls-int/clients/admin
+
 fabric-ca-client register --id.name admin2@org1.minvu.cl --id.secret admin2pw --id.type admin -u http://admin:adminpw@localhost:7057
 
+export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/tls-int/clients/admin2@org1.minvu.cl
+
+fabric-ca-client enroll -u http://admin2@org1.minvu.cl:admin2pw@localhost:7057 --csr.names "$CSR_NAMES_ORG1" --csr.hosts "admin2@org1.minvu.cl,localhost" --enrollment.profile tls
+
+./identities.sh
+
+./msp.sh
+
+./artifacts.sh
+
+
+docker-compose -f docker-compose-cli-couchdb.yaml up -d
+
+./channels.sh
+
 ´´´
+
+nuevo usuario en la organizacion 1 
+
+export CSR_NAMES_ORG1="C=CO,ST=Antioquia,L=Medellin,O=Org1,OU=Hyperledger Fabric" 
+
+export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin
+
+fabric-ca-client register --id.name user1@org1.minvu.cl --id.secret user1pw --id.type client --id.affiliation postulacion.Mint -u http://admin:adminpw@localhost:7056
+
+
+export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/user1@org1.minvu.cl
+
+fabric-ca-client enroll -u http://user1@org1.minvu.cl:user1pw@localhost:7056 --csr.names "$CSR_NAMES_ORG1"
+
 
