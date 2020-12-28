@@ -1,0 +1,155 @@
+---
+name: minvu-network-local
+version: "1.0"
+caliper:
+  blockchain: fabric
+organizations:
+  Org1:
+    mspid: Org1MSP
+    peers:
+      - peer0.org1.minvu.cl
+    #certificateAuthorities:
+    #  - #  int.ca.org1.minvu.cl:
+    adminPrivateKey:
+      path: ../minvu-network/fabric-ca/org1.minvu.cl/users/admin@org1.minvu.cl/msp/keystore/priv.key
+    signedCert:
+      path: ../minvu-network/fabric-ca/org1.minvu.cl/users/admin@org1.minvu.cl/msp/signcerts/cert.pem
+  Org2:
+    mspid: Org2MSP
+    peers:
+      - peer0.org2.minvu.cl
+    #certificateAuthorities:
+    #  - #  int.ca.org2.minvu.cl:
+    adminPrivateKey:
+      path: ../minvu-network/fabric-ca/org2.minvu.cl/users/admin@org2.minvu.cl/msp/keystore/priv.key
+    signedCert:
+      path: ../minvu-network/fabric-ca/org2.minvu.cl/users/admin@org2.minvu.cl/msp/signcerts/cert.pem
+  Org3:
+    mspid: Org3MSP
+    peers:
+      - peer0.org3.minvu.cl
+    #certificateAuthorities:
+    #  - #  int.ca.org3.minvu.cl:
+    adminPrivateKey:
+      path: ../minvu-network/fabric-ca/org3.minvu.cl/users/admin@3.minvu.cl/msp/keystore/priv.key
+    signedCert:
+      path: ../minvu-network/fabric-ca/org3.minvu.cl/users/admin@org3.minvu.cl/msp/signcerts/cert.pem
+channels:
+  postulacion:
+    orderers:
+      - orderer.org1.minvu.cl
+      - orderer.org2.minvu.cl
+      - orderer.org3.minvu.cl
+    peers:
+      peer0.org1.minvu.cl:
+        eventSource: true
+      peer0.org2.minvu.cl:
+        eventSource: true
+      peer0.org3.minvu.cl:
+        eventSource: true
+    created: true
+    chaincodes:
+      - id: minvucontrol
+        version: v1.0
+        language: golang
+clients:
+  client@org1.minvu.cl:
+    client:
+      organization: Org1
+      connection:
+        timeout:
+          peer:
+            endorser: "300"
+      credentialStore:
+        path: tmp/hfc-kvs/org1
+        cryptoStore:
+          path: tmp/hfc-kvs/org1
+      clientPrivateKey:
+        path: ../minvu-network/fabric-ca/org1.minvu.cl/users/client@org1.minvu.cl/msp/keystore/priv.key
+      clientSignedCert:
+        path: ../minvu-network/fabric-ca/org1.minvu.cl/users/client@org1.minvu.cl/msp/signcerts/cert.pem
+  client@org2.minvu.cl:
+    client:
+      organization: Org2
+      connection:
+        timeout:
+          peer:
+            endorser: "300"
+      credentialStore:
+        path: tmp/hfc-kvs/org2
+        cryptoStore:
+          path: tmp/hfc-kvs/org2
+      clientPrivateKey:
+        path: ../minvu-network/fabric-ca/org2.minvu.cl/users/client@org2.minvu.cl/msp/keystore/priv.key
+      clientSignedCert:
+        path: ../minvu-network/fabric-ca/org2.minvu.cl/users/client@org2.minvu.cl/msp/signcerts/cert.pem
+  client@org3.minvu.cl:
+    client:
+      organization: Org3
+      connection:
+        timeout:
+          peer:
+            endorser: "300"
+      credentialStore:
+        path: tmp/hfc-kvs/org3
+        cryptoStore:
+          path: tmp/hfc-kvs/org3
+      clientPrivateKey:
+        path: ../minvu-network/fabric-ca/org3.minvu.cl/users/client@org3.minvu.cl/msp/keystore/priv.key
+      clientSignedCert:
+        path: ../minvu-network/fabric-ca/org3.minvu.cl/users/client@org3.minvu.cl/msp/signcerts/cert.pem
+peers:
+  peer0.org1.minvu.cl:
+    url: grpcs://localhost:7051
+    tlsCACerts:
+      path: ../minvu-network/fabric-ca/org1.minvu.cl/tls-int/ca-chain.pem
+    grpcOptions:
+      ssl-target-name-override: peer0.org1.minvu.cl
+      hostnameOverride: peer0.org1.minvu.cl
+      grpc.keepalive_time_ms: 600000
+  peer0.org2.minvu.cl:
+    url: grpcs://localhost:8051
+    tlsCACerts:
+      path: ../minvu-network/fabric-ca/org2.minvu.cl/tls-int/ca-chain.pem
+    grpcOptions:
+      ssl-target-name-override: peer0.org2.minvu.cl
+      hostnameOverride: peer0.org2.minvu.cl
+      grpc.keepalive_time_ms: 600000
+  peer0.org3.minvu.cl:
+    url: grpcs://localhost:9051
+    tlsCACerts:
+      path: ../minvu-network/fabric-ca/org3.minvu.cl/tls-int/ca-chain.pem
+    grpcOptions:
+      ssl-target-name-override: peer0.org3.minvu.cl
+      hostnameOverride: peer0.org3.minvu.cl
+      grpc.keepalive_time_ms: 600000
+orderers:
+  orderer.org1.minvu.cl:
+    url: grpcs://localhost:7050
+    grpcOptions:
+      ssl-target-name-override: orderer.org1.minvu.cl
+    tlsCACerts:
+      path: ../minvu-network/fabric-ca/org1.minvu.cl/tls-int/ca-chain.pem
+  orderer.org2.minvu.cl:
+    url: grpcs://localhost:8050
+    grpcOptions:
+      ssl-target-name-override: orderer.org2.minvu.cl
+    tlsCACerts:
+      path: ../minvu-network/fabric-ca/org2.minvu.cl/tls-int/ca-chain.pem
+  orderer.org3.minvu.cl:
+    url: grpcs://localhost:9050
+    grpcOptions:
+      ssl-target-name-override: orderer.org3.minvu.cl
+    tlsCACerts:
+      path: ../minvu-network/fabric-ca/org3.minvu.cl/tls-int/ca-chain.pem
+#certificateAuthorities:
+#  int.ca.org1.minvu.cl:
+#    url: http://localhost:7056
+#    caName: int.ca.org1.minvu.cl
+#    #tlsCACerts:
+#    #  pem:
+#    #    - |
+#    #      ${CAPEM}
+#    httpOptions:
+#      verify: false
+

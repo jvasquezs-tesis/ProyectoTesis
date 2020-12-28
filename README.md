@@ -204,3 +204,35 @@ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypt
 -Insertar desde organizacion 3.
 CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.minvu.cl/users/Admin@org3.minvu.cl/msp CORE_PEER_ADDRESS=peer0.org3.minvu.cl:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.minvu.cl/peers/peer0.org3.minvu.cl/tls/ca.crt peer chaincode invoke -o orderer.minvu.cl:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","5","176941979","3180","55","1300","Ingresado","serviu"]}'
 
+
+
+----------------------------------------------------------------------------------------------------------
+CONFIGURAR CA PARA LAS OTRAS ORGANIZACIONES
+----------------------------------------------------------------------------------------------------------
+
+USO DE BINARIOS DE FABRIC SIN DOCKER CLI
+
+verificar que se tenga instalado de lo contrario instalar
+gcc -version
+Instalar gcc 
+sudo apt install gcc
+
+go get -u github.com/hyperledger/fabric/cmd/configtxgen
+go get -u github.com/hyperledger/fabric/cmd/configtxlator
+go get -u github.com/hyperledger/fabric/cmd/peer
+go get -u github.com/hyperledger/fabric-ca/cmd/fabric-ca-client
+
+export PATH=$PATH:$GOPATH/bin
+
+-Crear archivo en la raiz de minvu-network, se desplegara el Root CA para todas las organizaciones por separado.
+docker-compose-root-ca.yaml
+
+
+-Crear archivo en la raiz de minvu-network, se desplegara el Root CA para todas las organizaciones por separado.
+docker-compose-int-ca.yaml
+
+
+
+
+
+
