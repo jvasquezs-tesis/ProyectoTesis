@@ -62,7 +62,7 @@ export CSR_NAMES_ORG1="C=CL,ST=Santiago,L=Santiago,O=Org1,OU=Hyperledger Fabric"
 issueCertificates int 7056 org1.minvu.cl admin@org1.minvu.cl adminpw admin "$CSR_NAMES_ORG1" ""
 issueTLSCertificates tls-int 7057 org1.minvu.cl admin@org1.minvu.cl adminpw admin "$CSR_NAMES_ORG1" "admin@org1.minvu.cl,localhost"
 # issue certificates for client identity and for client tls
-issueCertificatesWithAffiliation int 7056 org1.minvu.cl client@org1.minvu.cl clientpw client postulacion"$CSR_NAMES_ORG1" ""
+issueCertificatesWithAffiliation int 7056 org1.minvu.cl client@org1.minvu.cl clientpw client postulacion "$CSR_NAMES_ORG1" ""
 issueTLSCertificates tls-int 7057 org1.minvu.cl client@org1.minvu.cl clientpw client "$CSR_NAMES_ORG1" "client@org1.minvu.cl,localhost"
 # issue certificates for peer node identity and for peer server tls
 issueCertificates int 7056 org1.minvu.cl peer0.org1.minvu.cl peerpw peer "$CSR_NAMES_ORG1" ""
@@ -77,7 +77,7 @@ export CSR_NAMES_ORG2="C=CL,ST=Santiago,L=Santiago,O=Org2,OU=Hyperledger Fabric"
 issueCertificates int 8056 org2.minvu.cl admin@org2.minvu.cl adminpw admin "$CSR_NAMES_ORG2" ""
 issueTLSCertificates tls-int 8057 org2.minvu.cl admin@org2.minvu.cl adminpw admin "$CSR_NAMES_ORG2" "admin@org2.minvu.cl,localhost"
 # issue certificates for client identity and for client tls
-issueCertificatesWithAffiliation int 8056 org2.minvu.cl client@org2.minvu.cl clientpw client postulacion"$CSR_NAMES_ORG2" ""
+issueCertificatesWithAffiliation int 8056 org2.minvu.cl client@org2.minvu.cl clientpw client postulacion "$CSR_NAMES_ORG2" ""
 issueTLSCertificates tls-int 8057 org2.minvu.cl client@org2.minvu.cl clientpw client "$CSR_NAMES_ORG2" "client@org2.minvu.cl,localhost"
 # issue certificates for peer node identity and for peer server tls
 issueCertificates int 8056 org2.minvu.cl peer0.org2.minvu.cl peerpw peer "$CSR_NAMES_ORG2" ""
@@ -92,7 +92,7 @@ export CSR_NAMES_ORG3="C=CL,ST=Santiago,L=Santiago,O=Org3,OU=Hyperledger Fabric"
 issueCertificates int 9056 org3.minvu.cl admin@org3.minvu.cl adminpw admin "$CSR_NAMES_ORG3" ""
 issueTLSCertificates tls-int 9057 org3.minvu.cl admin@org3.minvu.cl adminpw admin "$CSR_NAMES_ORG3" "admin@org3.minvu.cl,localhost"
 # issue certificates for client identity and for client tls
-issueCertificatesWithAffiliation int 9056 org3.minvu.cl client@org3.minvu.cl clientpw client postulacion"$CSR_NAMES_ORG3" ""
+issueCertificatesWithAffiliation int 9056 org3.minvu.cl client@org3.minvu.cl clientpw client postulacion "$CSR_NAMES_ORG3" ""
 issueTLSCertificates tls-int 9057 org3.minvu.cl client@org3.minvu.cl clientpw client "$CSR_NAMES_ORG3" "client@org3.minvu.cl,localhost"
 # issue certificates for peer node identity and for peer server tls
 issueCertificates int 9056 org3.minvu.cl peer0.org3.minvu.cl peerpw peer "$CSR_NAMES_ORG3"

@@ -10,6 +10,7 @@ import (
 func main() {
 	fmt.Printf("Start main")
 	foodControlContract := new(contracts.FoodControlContract)
+	
 	USDContract := new(contracts.CurrencyContract)
 	USDContract.TransactionContextHandler = new(contracts.CustomTransactionContext)
 	USDContract.BeforeTransaction = contracts.BeforeTransaction
@@ -18,6 +19,7 @@ func main() {
 	USDContract.Currency.Code = "USD"
 	USDContract.Currency.Decimals = 2
 	USDContract.Name = "USDCurrencyContract"
+	
 	COPContract := new(contracts.CurrencyContract)
 	COPContract.TransactionContextHandler = new(contracts.CustomTransactionContext)
 	COPContract.BeforeTransaction = contracts.BeforeTransaction

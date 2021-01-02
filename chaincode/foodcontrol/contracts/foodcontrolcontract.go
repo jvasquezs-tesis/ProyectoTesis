@@ -17,7 +17,7 @@ type FoodControlContract struct {
 // Set stores a food item in the state
 func (fcc *FoodControlContract) Set(ctx contractapi.TransactionContextInterface, foodID string, variety string) error {
 	// Validaciones del remitente de la transacción
-	hasOU, err := cid.HasOUValue(ctx.GetStub(), "department2")
+	hasOU, err := cid.HasOUValue(ctx.GetStub(), "Mint")
 	if err != nil {
 		return err
 	}

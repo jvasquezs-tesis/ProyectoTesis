@@ -6,7 +6,7 @@ import (
 
 // Business errors
 var (
-	ErrNoFarmer = errors.New("The identity should be a farmer to execute the transaction")
+	ErrNoFarmer = errors.New("minvucontrol The identity should be a farmer to execute the transaction")
 )
 
 //Food describes basic details of what makes up a food

@@ -1,20 +1,39 @@
-package marketplace
+package postulacion
 
 import "errors"
 
+/*
 // Currency specifies a currency // monedas
 type Currency struct {
 	Name     string `json:"name"`
 	Code     string `json:"code"`
 	Decimals int    `json:"decimals"`
 }
+*/
 
+type Tipologia struct {
+	Nombre     string `json:"nombre"`
+	Code     string `json:"code"`
+}
+
+/*
 // CurrencyUTXO is an unspent amount of a certain currency
 type CurrencyUTXO struct {
 	ID                string `json:"id"`
 	Issuer            string `json:"issuer"`
 	Owner             string `json:"owner"`
 	Value             int    `json:"value"`
+	RedemptionPending bool   `json:"redemptionPending"`
+}
+*/
+// CurrencyUTXO is an unspent amount of a certain currency
+type Postulacion struct {
+	ID                string  `json:"id"`
+	Emisor            string  `json:"emisor"` // siempre EGR al inicio.
+	Receptor          string  `json:"receptor"`
+	RutPostulante     int     `json:"rutpostulante"`
+	Puntaje			  float32 `json:"puntaje"`
+	MontoSubsidioUF   float32 `json:"montosubsidiouf"`
 	RedemptionPending bool   `json:"redemptionPending"`
 }
 
@@ -29,12 +48,21 @@ type CurrencyUTXO struct {
 	}
 */
 // CurrencyTrustline sets if an organization trusts an issuer to receive coins from
-type CurrencyTrustline struct {
+/*type CurrencyTrustline struct {
 	Receiver string `json:"receiver"`
 	Issuer   string `json:"issuer"`
 	Trust    bool   `json:"trust"`
 	MaxLimit int    `json:"maxLimit"`
 }
+*/
+
+// CurrencyTrustline sets if an organization trusts an issuer to receive coins from
+type PostulacionTrustLine struct {
+	Receptor string `json:"receptor"`
+	Emisor   string `json:"emisor"`
+	Trust    bool   `json:"trust"`
+}
+
 
 /*
 // CurrencyTrustline establece si una organización confía en un emisor para recibir monedas de
@@ -44,17 +72,9 @@ type CurrencyTrustline struct {
 	Confíe en bool `json:" confianza "`
 	MaxLimit int `json:" maxLimit "`
 	}
-
-/*
-	// CurrencyTrustline establece si una organización confía en un emisor para recibir monedas de
-type CurrencyTrustline struct {
-	Cadena de receptor `json:" receptor "`
-	Cadena de emisor `json:" emisor "`
-	Confíe en bool `json:" confianza "`
-	MaxLimit int `json:" maxLimit "`
-	}
 */
 
+/*
 // CurrencyEventNames specifies the names of the events that should be fired after the txs
 var CurrencyEventNames = map[string]string{
 	"Mint":              "Minted",
@@ -62,6 +82,14 @@ var CurrencyEventNames = map[string]string{
 	"RequestRedemption": "RedemptionRequested",
 	"ConfirmRedemption": "RedemptionConfirmed",
 	"SetTrustline":      "TrustlineSet",
+}
+*/
+var PostulacionEventNames = map[string]string{
+	"Mint":              "Minted",   // emision del token 
+	"Transfer":          "Transfered", // transferencia 
+	"RequestRedemption": "RedemptionRequested", // solicitar intercambio de token por efectivo
+	"ConfirmRedemption": "RedemptionConfirmed", // destruir token en la red
+	"SetTrustline":      "TrustlineSet", // quien permitio el envio o bloqueo 
 }
 
 /*
