@@ -1,4 +1,5 @@
-module github.com/braduf/curso-hyperledger-fabric/chaincode/foodcontrol
+//module github.com/braduf/curso-hyperledger-fabric/chaincode/foodcontrol
+module github.com/jvasquezs-tesis/ProyectoTesis/tree/master/chaincode/minvucontrol
 
 go 1.13
 

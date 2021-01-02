@@ -1,27 +1,27 @@
 package shim
 
 import (
-	"github.com/braduf/curso-hyperledger-fabric/chaincode/foodcontrol/marketplace"
+	//"github.com/braduf/curso-hyperledger-fabric/chaincode/foodcontrol/marketplace"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 )
 
 // CurrencyUTXOState represents a CurrencyUTXO on the World State
 type CurrencyUTXOState struct {
 	DocType string `json:"docType"`
-	Value   marketplace.CurrencyUTXO
+	Value   postulacion.CurrencyUTXO
 }
 
 // CurrencyTrustlineState represents a Trustline on the World State
 type CurrencyTrustlineState struct {
 	DocType string `json:"docType"`
-	Value   marketplace.CurrencyTrustline
+	Value   postulacion.CurrencyTrustline
 }
 
 // TrustlineDocType is the Document type a trustline will be stored under in the World State
 var TrustlineDocType = "TL"
 
 // PutCurrencyUTXO stores a UTXO as a state in the World State
-func PutCurrencyUTXO(stub shim.ChaincodeStubInterface, currencyCode string, utxo marketplace.CurrencyUTXO) (err error) {
+func PutCurrencyUTXO(stub shim.ChaincodeStubInterface, currencyCode string, utxo postulacion.CurrencyUTXO) (err error) {
 	key, err := stub.CreateCompositeKey(currencyCode, []string{utxo.ID})
 	if err != nil {
 		return
@@ -31,7 +31,7 @@ func PutCurrencyUTXO(stub shim.ChaincodeStubInterface, currencyCode string, utxo
 }
 
 // PutCurrencyTrustline stores a trustline as a state in the World State
-func PutCurrencyTrustline(stub shim.ChaincodeStubInterface, currencyCode string, tl marketplace.CurrencyTrustline) (err error) {
+func PutCurrencyTrustline(stub shim.ChaincodeStubInterface, currencyCode string, tl postulacion.CurrencyTrustline) (err error) {
 	key, err := stub.CreateCompositeKey(TrustlineDocType, []string{currencyCode, tl.Receiver, tl.Issuer})
 	if err != nil {
 		return
@@ -51,7 +51,7 @@ func DeleteCurrencyUTXO(stub shim.ChaincodeStubInterface, currencyCode string, i
 }
 
 // GetCurrencyUTXOByID retrieves the UTXO with id from the World State
-func GetCurrencyUTXOByID(stub shim.ChaincodeStubInterface, currencyCode string, id string) (utxo marketplace.CurrencyUTXO, err error) {
+func GetCurrencyUTXOByID(stub shim.ChaincodeStubInterface, currencyCode string, id string) (utxo postulacion.CurrencyUTXO, err error) {
 	key, err := stub.CreateCompositeKey(currencyCode, []string{id})
 	if err != nil {
 		return
@@ -67,7 +67,7 @@ func GetCurrencyUTXOByID(stub shim.ChaincodeStubInterface, currencyCode string, 
 }
 
 // GetCurrencyTrustline retrieves a trustline from the World State
-func GetCurrencyTrustline(stub shim.ChaincodeStubInterface, currencyCode string, receiver string, issuer string) (tl marketplace.CurrencyTrustline, err error) {
+func GetCurrencyTrustline(stub shim.ChaincodeStubInterface, currencyCode string, receiver string, issuer string) (tl postulacion.CurrencyTrustline, err error) {
 	key, err := stub.CreateCompositeKey(TrustlineDocType, []string{currencyCode, receiver, issuer})
 	if err != nil {
 		return
@@ -102,7 +102,7 @@ func GetHistoryForCurrencyUTXOID(stub shim.ChaincodeStubInterface, currencyCode 
 func SetCurrencyEvent(stub shim.ChaincodeStubInterface, payload interface{}) (err error) {
 	funcName, _ := stub.GetFunctionAndParameters()
 
-	event, ok := marketplace.CurrencyEventNames[funcName]
+	event, ok := postulacion.CurrencyEventNames[funcName]
 	if !ok {
 		// No event should be set for this function
 		return

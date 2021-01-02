@@ -3,8 +3,8 @@ package contracts
 import (
 	"fmt"
 
-	"github.com/braduf/curso-hyperledger-fabric/chaincode/foodcontrol/marketplace"
-	"github.com/braduf/curso-hyperledger-fabric/chaincode/foodcontrol/shim"
+	//"github.com/braduf/curso-hyperledger-fabric/chaincode/foodcontrol/marketplace"
+	//"github.com/braduf/curso-hyperledger-fabric/chaincode/foodcontrol/shim"
 	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
