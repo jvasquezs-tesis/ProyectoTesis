@@ -3,8 +3,9 @@ package contracts
 import (
 	"fmt"
 
-	//"github.com/braduf/curso-hyperledger-fabric/chaincode/foodcontrol/marketplace"
-	//"github.com/braduf/curso-hyperledger-fabric/chaincode/foodcontrol/shim"
+
+	"github.com/jvasquezs-tesis/ProyectoTesis/tree/master/chaincode/minvucontrol/postulacion"
+	"github.com/jvasquezs-tesis/ProyectoTesis/tree/master/chaincode/minvucontrol/shim"
 	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
@@ -13,7 +14,7 @@ import (
 // and implement transactions that with currencies
 type MinvuControlContract struct {
 	contractapi.Contract
-	Currency marketplace.Currency
+	Tipologia postulacion.Tipologia
 }
 
 // BeforeTransaction will be executed before every transaction of this contract
@@ -24,7 +25,7 @@ func BeforeTransaction(ctx CustomTransactionContextInterface) (err error) {
 		return
 	}
 	if !hasChannelOU {
-		err = marketplace.ErrNoChannelPermissions
+		err = postulacion.ErrNoChannelPermissions
 		return
 	}
 	// GetMSPID and set it to tx context
@@ -44,64 +45,85 @@ func AfterTransaction(ctx CustomTransactionContextInterface, txReturnValue inter
 }
 
 // GetEvaluateTransactions returns functions of CurrencyContract not to be tagged as submit
-func (cc *CurrencyContract) GetEvaluateTransactions() []string {
+func (cc *MinvuControlContract) GetEvaluateTransactions() []string {
 	return []string{"GetHistoryOfUTXO", "QueryCouchDB"}
 }
 
-// Mint issues new coins for a specified amount to a specified receiver
-func (cc *CurrencyContract) Mint(ctx CustomTransactionContextInterface, amount int, receiver string) (payload marketplace.MintedPayload, err error) {
+// Mint issues new coins for a specified amount to a specified receptor
+func (cc *MinvuControlContract) Mint(ctx CustomTransactionContextInterface, receptor string,  rutpostulante int,  puntaje float32,  montosubsidiouf float32) (payload postulacion.MintedPayload, err error) {
 	// Validate parameters
-	if amount <= 0 {
-		err = marketplace.ErrNegativeMintAmount
+	if montosubsidiouf < 0 {
+		err = postulacion.ErrValidarMontoSubsidioUF
 		return
 	}
+
+	if puntaje < 0 || puntaje > 100{
+		err = postulacion.ErrValidarPuntaje
+		return 
+	}
+
 	// Check decimals of amount
-	if receiver == "" {
-		err = marketplace.ErrMintReceiverRequiered
+	if receptor == ""{
+		err = postulacion.ErrReceptorRequerido
 		return
 	}
 
+/*
+	// Check decimals of amount
+	if rutpostulante == ""{
+		err = postulacion.ErrRutPostulanteRequerido
+		return
+	}
+*/
 	// Mint a new UTXO
-	utxo := marketplace.CurrencyUTXO{
+	utxo := postulacion.Postulacion{
 		ID:     ctx.GetStub().GetTxID() + ":" + "0",
-		Issuer: ctx.GetMSPID(),
-		Owner:  receiver,
-		Value:  amount,
+		Emisor: ctx.GetMSPID(),
+		Receptor        :receptor,
+		RutPostulante   :rutpostulante,
+		Puntaje			:puntaje,
+		MontoSubsidioUF :montosubsidiouf,
 	}
 
-	err = shim.PutCurrencyUTXO(ctx.GetStub(), cc.Currency.Code, utxo)
+	err = shim.PutPostulacion(ctx.GetStub(), cc.Tipologia.Code, utxo)
 	if err != nil {
 		return
 	}
 
 	// Return the event payload
-	payload = marketplace.MintedPayload{
+	payload = postulacion.MintedPayload{
 		Minter:       ctx.GetMSPID(),
 		UTXOID:       utxo.ID,
-		Receiver:     receiver,
-		CurrencyCode: cc.Currency.Code,
+		Receptor:     receptor,
+		TipologiaCode: cc.Tipologia.Code,
 	}
 	//ctx.SetEventPayload(payload)
 	return
 }
 
-// Transfer transfers a specified amount of the utxo set to a specified receiver
-func (cc *CurrencyContract) Transfer(ctx CustomTransactionContextInterface, utxoIDSet []string, amount int, receiver string) (payload marketplace.TransferedPayload, err error) {
+// Transfer transfers a specified amount of the utxo set to a specified receptor
+func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, utxoIDSet []string, receptor string,  rutpostulante int,  puntaje float32,  montosubsidiouf float32) (payload postulacion.TransferedPayload, err error) {
 	// Validate parameters
 	if len(utxoIDSet) == 0 {
-		err = marketplace.ErrTransferEmptyUTXOSet
+		err = postulacion.ErrTransferEmptyUTXOSet
 		fmt.Printf(err.Error())
 		return
 	}
-	if amount <= 0 {
-		err = marketplace.ErrNegativeMintAmount
-		fmt.Printf(err.Error())
+
+	// Validate parameters
+	if montosubsidiouf < 0 {
+		err = postulacion.ErrValidarMontoSubsidioUF
 		return
 	}
-	// TODO: Check decimals of amount
-	if receiver == "" {
-		err = marketplace.ErrMintReceiverRequiered
-		fmt.Printf(err.Error())
+
+	if puntaje < 0 || puntaje > 100{
+		err = postulacion.ErrValidarPuntaje
+		return 
+	}
+
+	// Check decimals of amount
+	if receptor == ""{
+		err = postulacion.ErrReceptorRequerido
 		return
 	}
 
@@ -112,25 +134,25 @@ func (cc *CurrencyContract) Transfer(ctx CustomTransactionContextInterface, utxo
 	for i, utxoID := range utxoIDSet {
 		// Check duplicate ID in utxo set
 		if spentUTXO[utxoID] {
-			err = marketplace.ErrDoubleSpentTransfer
+			err = postulacion.ErrDoubleSpentTransfer
 			fmt.Printf(err.Error())
 			return
 		}
 		// Obtain UTXO from state
-		var utxo marketplace.CurrencyUTXO
-		utxo, err = shim.GetCurrencyUTXOByID(ctx.GetStub(), cc.Currency.Code, utxoID)
+		var utxo postulacion.Postulacion
+		utxo, err = shim.GetPostulacionByID(ctx.GetStub(), cc.Tipologia.Code, utxoID)
 		if err != nil {
 			fmt.Printf(err.Error())
 			return
 		}
 		// Set issuer of the first utxo in the set
 		if i == 0 {
-			issuer = utxo.Issuer
-			// Check if the receiver accepts coins from this issuer
-			var tl marketplace.CurrencyTrustline
-			tl, err = shim.GetCurrencyTrustline(ctx.GetStub(), cc.Currency.Code, receiver, issuer)
+			issuer = utxo.Emisor
+			// Check if the receptor accepts coins from this issuer
+			var tl postulacion.PostulacionTrustline
+			tl, err = shim.GetPostulacionTrustline(ctx.GetStub(), cc.Tipologia.Code, receptor, emisor)
 			if err == shim.ErrStateNotFound {
-				err = marketplace.ErrTransferTrustline
+				err = postulacion.ErrTransferTrustline
 				fmt.Printf(err.Error())
 				return
 			}
@@ -139,33 +161,33 @@ func (cc *CurrencyContract) Transfer(ctx CustomTransactionContextInterface, utxo
 				return
 			}
 			if !tl.Trust {
-				err = marketplace.ErrTransferTrustline
+				err = postulacion.ErrTransferTrustline
 				fmt.Printf(err.Error())
 				return
 			}
 		}
 		// Check issuer
 		if utxo.Issuer != issuer {
-			err = marketplace.ErrOnlySameIssuerTransfer
+			err = postulacion.ErrOnlySameIssuerTransfer
 			fmt.Printf(err.Error())
 			return
 		}
 		// Check owner
 		if utxo.Owner != ctx.GetMSPID() {
-			err = marketplace.ErrOnlyOwnerTransfer
+			err = postulacion.ErrOnlyOwnerTransfer
 			fmt.Printf(err.Error())
 			return
 		}
 		// Check redemption status
 		if utxo.RedemptionPending {
-			err = marketplace.ErrPendingRedemptionTransfer
+			err = postulacion.ErrPendingRedemptionTransfer
 			fmt.Printf(err.Error())
 			return
 		}
 		// Add value to input amount
 		totalInputAmount += utxo.Value
 
-		err = shim.DeleteCurrencyUTXO(ctx.GetStub(), cc.Currency.Code, utxoID)
+		err = shim.DeletePostulacion(ctx.GetStub(), cc.Tipologia.Code, utxoID)
 		if err != nil {
 			fmt.Printf(err.Error())
 			return
@@ -174,19 +196,19 @@ func (cc *CurrencyContract) Transfer(ctx CustomTransactionContextInterface, utxo
 	}
 
 	// Create new outputs
-	var transferUTXO, changeUTXO marketplace.CurrencyUTXO
+	var transferUTXO, changeUTXO postulacion.Postulacion
 	if totalInputAmount < amount {
-		err = marketplace.ErrInsufficientTransferFunds
+		err = postulacion.ErrInsufficientTransferFunds
 		fmt.Printf(err.Error())
 		return
 	}
-	transferUTXO = marketplace.CurrencyUTXO{
+	transferUTXO = postulacion.Postulacion{
 		ID:     ctx.GetStub().GetTxID() + ":" + "0",
-		Issuer: issuer,
-		Owner:  receiver,
+		Emisor: emisor,
+		Receptor:  receptor,
 		Value:  amount,
 	}
-	err = shim.PutCurrencyUTXO(ctx.GetStub(), cc.Currency.Code, transferUTXO)
+	err = shim.PutPostulacion(ctx.GetStub(), cc.Currency.Code, transferUTXO)
 	if err != nil {
 		fmt.Printf(err.Error())
 		return
@@ -194,13 +216,13 @@ func (cc *CurrencyContract) Transfer(ctx CustomTransactionContextInterface, utxo
 
 	changeAmount := totalInputAmount - amount
 	if changeAmount > 0 {
-		changeUTXO = marketplace.CurrencyUTXO{
+		changeUTXO = postulacion.Postulacion{
 			ID:     ctx.GetStub().GetTxID() + ":" + "1",
 			Issuer: issuer,
 			Owner:  ctx.GetMSPID(),
 			Value:  changeAmount,
 		}
-		err = shim.PutCurrencyUTXO(ctx.GetStub(), cc.Currency.Code, changeUTXO)
+		err = shim.PutPostulacion(ctx.GetStub(), cc.Tipologia.Code, changeUTXO)
 		if err != nil {
 			fmt.Printf(err.Error())
 			return
@@ -208,13 +230,13 @@ func (cc *CurrencyContract) Transfer(ctx CustomTransactionContextInterface, utxo
 	}
 
 	// Set the event payload
-	payload = marketplace.TransferedPayload{
+	payload = postulacion.TransferedPayload{
 		TransferedBy: ctx.GetMSPID(),
 		//SpentUTXOIDSet:   utxoIDSet,
 		ChangeUTXOID:     changeUTXO.ID,
 		TransferedUTXOID: transferUTXO.ID,
-		Receiver:         receiver,
-		CurrencyCode:     cc.Currency.Code,
+		Receptor:         receptor,
+		TipologiaCode:     cc.Tipologia.Code,
 	}
 	fmt.Printf("End of Transfer: " + payload.TransferedUTXOID)
 	//ctx.SetEventPayload(payload)
@@ -222,76 +244,76 @@ func (cc *CurrencyContract) Transfer(ctx CustomTransactionContextInterface, utxo
 }
 
 // RequestRedemption requests to receive the off-chain currency that is guarded by the issuer of the specified UTXO
-func (cc *CurrencyContract) RequestRedemption(ctx CustomTransactionContextInterface, utxoID string) (payload marketplace.RedemptionRequestedPayload, err error) {
-	utxo, err := shim.GetCurrencyUTXOByID(ctx.GetStub(), cc.Currency.Code, utxoID)
+func (cc *MinvuControlContract) RequestRedemption(ctx CustomTransactionContextInterface, utxoID string) (payload postulacion.RedemptionRequestedPayload, err error) {
+	utxo, err := shim.GetPostulacionByID(ctx.GetStub(), cc.Tipologia.Code, utxoID)
 	if err != nil {
 		return
 	}
 	if utxo.RedemptionPending {
-		err = marketplace.ErrRedemptionRequestPending
+		err = postulacion.ErrRedemptionRequestPending
 		return
 	}
 	if utxo.Owner != ctx.GetMSPID() {
-		err = marketplace.ErrOnlyOwnerRequestRedemption
+		err = postulacion.ErrOnlyOwnerRequestRedemption
 		return
 	}
 	utxo.RedemptionPending = true
-	err = shim.PutCurrencyUTXO(ctx.GetStub(), cc.Currency.Code, utxo)
+	err = shim.PutPostulacion(ctx.GetStub(), cc.Tipologia.Code, utxo)
 	if err != nil {
 		return
 	}
 
-	payload = marketplace.RedemptionRequestedPayload{
+	payload = postulacion.RedemptionRequestedPayload{
 		Requestor:    ctx.GetMSPID(),
 		Redeemer:     utxo.Issuer,
 		UTXOID:       utxo.ID,
-		CurrencyCode: cc.Currency.Code,
+		TipologiaCode: cc.Tipologia.Code,
 	}
 	//ctx.SetEventPayload(payload)
 	return
 }
 
 // ConfirmRedemption confirms the off-chain reception of the currency represented by the utxo and destroys the utxo on-chain
-func (cc *CurrencyContract) ConfirmRedemption(ctx CustomTransactionContextInterface, utxoID string) (payload marketplace.RedemptionConfirmedPayload, err error) {
-	utxo, err := shim.GetCurrencyUTXOByID(ctx.GetStub(), cc.Currency.Code, utxoID)
+func (cc *MinvuControlContract) ConfirmRedemption(ctx CustomTransactionContextInterface, utxoID string) (payload postulacion.RedemptionConfirmedPayload, err error) {
+	utxo, err := shim.GetPostulacionByID(ctx.GetStub(), cc.Tipologia.Code, utxoID)
 	if err != nil {
 		return
 	}
 	if !utxo.RedemptionPending {
-		err = marketplace.ErrNoRedemptionRequestToConfirm
+		err = postulacion.ErrNoRedemptionRequestToConfirm
 		return
 	}
 	if utxo.Owner != ctx.GetMSPID() {
-		err = marketplace.ErrOnlyOwnerConfirmRedemption
+		err = postulacion.ErrOnlyOwnerConfirmRedemption
 		return
 	}
-	err = shim.DeleteCurrencyUTXO(ctx.GetStub(), cc.Currency.Code, utxoID)
+	err = shim.DeletePostulacion(ctx.GetStub(), cc.Tipologia.Code, utxoID)
 	if err != nil {
 		return
 	}
 
-	payload = marketplace.RedemptionConfirmedPayload{
+	payload = postulacion.RedemptionConfirmedPayload{
 		ConfirmedBy:  ctx.GetMSPID(),
 		Redeemer:     utxo.Issuer,
 		UTXOID:       utxo.ID,
-		CurrencyCode: cc.Currency.Code,
+		TipologiaCode: cc.Tipologia.Code,
 	}
 	//ctx.SetEventPayload(payload)
 	return
 }
 
 // SetTrustline can be used to enable or disable receptions of this currency from a specific issuer
-func (cc *CurrencyContract) SetTrustline(ctx CustomTransactionContextInterface, issuer string, trust bool, limit int) (payload marketplace.TrustlineSetPayload, err error) {
+func (cc *MinvuControlContract) SetTrustline(ctx CustomTransactionContextInterface, issuer string, trust bool, limit int) (payload postulacion.TrustlineSetPayload, err error) {
 	// createCompositeKey with currency code, sender,issuer and value of bool trust
 	// Validate parameters
 	if issuer == "" {
-		err = marketplace.ErrTrustlineIssuerRequiered
+		err = postulacion.ErrTrustlineIssuerRequiered
 		return
 	}
 
 	// Set trustline
-	err = shim.PutCurrencyTrustline(ctx.GetStub(), cc.Currency.Code, marketplace.CurrencyTrustline{
-		Receiver: ctx.GetMSPID(),
+	err = shim.PutCurrencyTrustline(ctx.GetStub(), cc.Tipologia.Code, postulacion.CurrencyTrustline{
+		Receptor: ctx.GetMSPID(),
 		Issuer:   issuer,
 		Trust:    trust,
 		MaxLimit: limit,
@@ -300,25 +322,27 @@ func (cc *CurrencyContract) SetTrustline(ctx CustomTransactionContextInterface, 
 		return
 	}
 
-	payload = marketplace.TrustlineSetPayload{
-		Receiver:     ctx.GetMSPID(),
+	payload = postulacion.TrustlineSetPayload{
+		Receptor:     ctx.GetMSPID(),
 		Issuer:       issuer,
 		Trust:        trust,
 		MaxLimit:     limit,
-		CurrencyCode: cc.Currency.Code,
+		TipologiaCode: cc.Tipologia.Code,
 	}
 	//ctx.SetEventPayload(payload)
 	return
 }
 
 // QueryCouchDB can be used to execute rich queries against the CouchDB
-func (cc *CurrencyContract) QueryCouchDB(ctx CustomTransactionContextInterface, query string) (queryResultInJSONString string, err error) {
+func (cc *MinvuControlContract) QueryCouchDB(ctx CustomTransactionContextInterface, query string) (queryResultInJSONString string, err error) {
 	queryResultInJSONString, err = shim.QueryCouchDB(ctx.GetStub(), query)
 	return
 }
 
 // GetHistoryOfUTXO can be used to search through the history of a UTXO
-func (cc *CurrencyContract) GetHistoryOfUTXO(ctx CustomTransactionContextInterface, id string) (historyInJSONString string, err error) {
-	historyInJSONString, err = shim.GetHistoryForCurrencyUTXOID(ctx.GetStub(), cc.Currency.Code, id)
+func (cc *MinvuControlContract) GetHistoryOfUTXO(ctx CustomTransactionContextInterface, id string) (historyInJSONString string, err error) {
+	historyInJSONString, err = shim.GetHistoryForPostulacionID(ctx.GetStub(), cc.Tipologia.Code, id)
 	return
 }
+
+

@@ -441,7 +441,7 @@ docker-compose -f docker-compose-cli-couchdb.yaml up -d
 
 nuevo usuario en la organizacion 1
 
-export CSR_NAMES_ORG1="C=CO,ST=Antioquia,L=Medellin,O=Org1,OU=Hyperledger Fabric"
+export CSR_NAMES_ORG1="C=CL,ST=Santiago,L=Santiago,O=Org1,OU=Hyperledger Fabric"
 
 export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin
 
@@ -450,3 +450,9 @@ fabric-ca-client register --id.name user1@org1.minvu.cl --id.secret user1pw --id
 export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/user1@org1.minvu.cl
 
 fabric-ca-client enroll -u http://user1@org1.minvu.cl:user1pw@localhost:7056 --csr.names "$CSR_NAMES_ORG1"
+
+
+
+instalar chaincode , posicionarse dentro de 
+
+minvu-network-scripts

@@ -1,6 +1,5 @@
 export FABRIC_CFG_PATH=$(cd ../ && pwd)
 export CC_NAME=minvucontrol
-# export CC_NAME=minvucontrol
 export CC_VERSION=v1.0
 export CC_SEQUENCE=1
 export CHANNEL_NAME=postulacion

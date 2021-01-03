@@ -1,38 +1,38 @@
 package shim
 
 import (
-	//"github.com/braduf/curso-hyperledger-fabric/chaincode/foodcontrol/marketplace"
+	"github.com/jvasquezs-tesis/ProyectoTesis/tree/master/chaincode/minvucontrol/postulacion"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 )
 
 // CurrencyUTXOState represents a CurrencyUTXO on the World State
-type CurrencyUTXOState struct {
+type PostulacionState struct {
 	DocType string `json:"docType"`
-	Value   postulacion.CurrencyUTXO
+	Value   postulacion.Postulacion
 }
 
 // CurrencyTrustlineState represents a Trustline on the World State
-type CurrencyTrustlineState struct {
+type PostulacionTrustLineState struct {
 	DocType string `json:"docType"`
-	Value   postulacion.CurrencyTrustline
+	Value   postulacion.PostulacionTrustLine
 }
 
 // TrustlineDocType is the Document type a trustline will be stored under in the World State
 var TrustlineDocType = "TL"
 
 // PutCurrencyUTXO stores a UTXO as a state in the World State
-func PutCurrencyUTXO(stub shim.ChaincodeStubInterface, currencyCode string, utxo postulacion.CurrencyUTXO) (err error) {
-	key, err := stub.CreateCompositeKey(currencyCode, []string{utxo.ID})
+func PutPostulacion(stub shim.ChaincodeStubInterface, tipologiaCode string, utxo postulacion.Postulacion) (err error) {
+	key, err := stub.CreateCompositeKey(tipologiaCode, []string{utxo.ID})
 	if err != nil {
 		return
 	}
-	err = PutState(stub, currencyCode, key, utxo)
+	err = PutState(stub, tipologiaCode, key, utxo)
 	return
 }
 
 // PutCurrencyTrustline stores a trustline as a state in the World State
-func PutCurrencyTrustline(stub shim.ChaincodeStubInterface, currencyCode string, tl postulacion.CurrencyTrustline) (err error) {
-	key, err := stub.CreateCompositeKey(TrustlineDocType, []string{currencyCode, tl.Receiver, tl.Issuer})
+func PutPostulacionTrustLine(stub shim.ChaincodeStubInterface, tipologiaCode string, tl postulacion.PostulacionTrustLine) (err error) {
+	key, err := stub.CreateCompositeKey(TrustlineDocType, []string{tipologiaCode, tl.Receptor, tl.Emisor})
 	if err != nil {
 		return
 	}
@@ -41,8 +41,8 @@ func PutCurrencyTrustline(stub shim.ChaincodeStubInterface, currencyCode string,
 }
 
 // DeleteCurrencyUTXO deletes a UTXO from the World State
-func DeleteCurrencyUTXO(stub shim.ChaincodeStubInterface, currencyCode string, id string) (err error) {
-	key, err := stub.CreateCompositeKey(currencyCode, []string{id})
+func DeletePostulacion(stub shim.ChaincodeStubInterface, tipologiaCode string, id string) (err error) {
+	key, err := stub.CreateCompositeKey(tipologiaCode, []string{id})
 	if err != nil {
 		return
 	}
@@ -51,13 +51,13 @@ func DeleteCurrencyUTXO(stub shim.ChaincodeStubInterface, currencyCode string, i
 }
 
 // GetCurrencyUTXOByID retrieves the UTXO with id from the World State
-func GetCurrencyUTXOByID(stub shim.ChaincodeStubInterface, currencyCode string, id string) (utxo postulacion.CurrencyUTXO, err error) {
-	key, err := stub.CreateCompositeKey(currencyCode, []string{id})
+func GetPostulacionByID(stub shim.ChaincodeStubInterface, tipologiaCode string, id string) (utxo postulacion.Postulacion, err error) {
+	key, err := stub.CreateCompositeKey(tipologiaCode, []string{id})
 	if err != nil {
 		return
 	}
 
-	var utxoState CurrencyUTXOState
+	var utxoState PostulacionState
 	err = GetState(stub, key, &utxoState)
 	if err != nil {
 		return
@@ -67,13 +67,13 @@ func GetCurrencyUTXOByID(stub shim.ChaincodeStubInterface, currencyCode string, 
 }
 
 // GetCurrencyTrustline retrieves a trustline from the World State
-func GetCurrencyTrustline(stub shim.ChaincodeStubInterface, currencyCode string, receiver string, issuer string) (tl postulacion.CurrencyTrustline, err error) {
-	key, err := stub.CreateCompositeKey(TrustlineDocType, []string{currencyCode, receiver, issuer})
+func GetPostulacionTrustLine(stub shim.ChaincodeStubInterface, tipologiaCode string, receptor string, emisor string) (tl postulacion.PostulacionTrustLine, err error) {
+	key, err := stub.CreateCompositeKey(TrustlineDocType, []string{tipologiaCode, receptor, emisor})
 	if err != nil {
 		return
 	}
 
-	var tlState CurrencyTrustlineState
+	var tlState PostulacionTrustLineState
 	err = GetState(stub, key, &tlState)
 	if err != nil {
 		return
@@ -83,8 +83,8 @@ func GetCurrencyTrustline(stub shim.ChaincodeStubInterface, currencyCode string,
 }
 
 // GetHistoryForCurrencyUTXOID retrieves all state changes a UTXO with the specified ID has gone through
-func GetHistoryForCurrencyUTXOID(stub shim.ChaincodeStubInterface, currencyCode string, id string) (historyJSONString string, err error) {
-	key, err := stub.CreateCompositeKey(currencyCode, []string{id})
+func GetHistoryForPostulacionID(stub shim.ChaincodeStubInterface, tipologiaCode string, id string) (historyJSONString string, err error) {
+	key, err := stub.CreateCompositeKey(tipologiaCode, []string{id})
 	if err != nil {
 		return
 	}
@@ -102,7 +102,7 @@ func GetHistoryForCurrencyUTXOID(stub shim.ChaincodeStubInterface, currencyCode 
 func SetCurrencyEvent(stub shim.ChaincodeStubInterface, payload interface{}) (err error) {
 	funcName, _ := stub.GetFunctionAndParameters()
 
-	event, ok := postulacion.CurrencyEventNames[funcName]
+	event, ok := postulacion.PostulacionEventNames[funcName]
 	if !ok {
 		// No event should be set for this function
 		return

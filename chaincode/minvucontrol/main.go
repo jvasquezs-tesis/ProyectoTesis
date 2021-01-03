@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/braduf/curso-hyperledger-fabric/chaincode/foodcontrol/contracts"
+	"github.com/jvasquezs-tesis/ProyectoTesis/tree/master/chaincode/minvucontrol/contracts"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
