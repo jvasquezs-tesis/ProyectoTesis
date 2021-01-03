@@ -150,7 +150,7 @@ type RedemptionRequestedPayload struct {
 	Requestor    string `json:"requestor"`
 	Redeemer     string `json:"redeemer"`
 	UTXOID       string `json:"utxoID"`
-	CurrencyCode string `json:"currencyCode"`
+	TipologiaCode string `json:"tipologiaCode"`
 }
 
 /*
@@ -168,7 +168,7 @@ type RedemptionConfirmedPayload struct {
 	ConfirmedBy  string `json:"confirmedBy"`
 	Redeemer     string `json:"redeemer"`
 	UTXOID       string `json:"utxoID"`
-	CurrencyCode string `json:"currencyCode"`
+	TipologiaCode string `json:"tipologiaCode"`
 }
 
 /*
@@ -184,11 +184,11 @@ CurrencyCode cadena `json:" currencyCode "`
 */
 // TrustlineSetPayload is the payload of the TrustlineSet Events
 type TrustlineSetPayload struct {
-	Receiver     string `json:"receiver"`
-	Issuer       string `json:"issuer"`
+	Receptor     string `json:"receptor"`
+	Emisor       string `json:"emisor"`
 	Trust        bool   `json:"trust"`
 	MaxLimit     int    `json:"maxLimit"`
-	CurrencyCode string `json:"currencyCode"`
+	TipologiaCode string `json:"tipologiaCode"`
 }
 
 /*

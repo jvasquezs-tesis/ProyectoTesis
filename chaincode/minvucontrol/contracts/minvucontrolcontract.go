@@ -128,9 +128,9 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 	}
 
 	// Validate and spend the UTXO set
-	totalInputAmount := 0
+	//totalInputAmount := 0
 	spentUTXO := make(map[string]bool)
-	var issuer string
+	var emisor string
 	for i, utxoID := range utxoIDSet {
 		// Check duplicate ID in utxo set
 		if spentUTXO[utxoID] {
@@ -147,10 +147,10 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 		}
 		// Set issuer of the first utxo in the set
 		if i == 0 {
-			issuer = utxo.Emisor
+			emisor = utxo.Emisor
 			// Check if the receptor accepts coins from this issuer
-			var tl postulacion.PostulacionTrustline
-			tl, err = shim.GetPostulacionTrustline(ctx.GetStub(), cc.Tipologia.Code, receptor, emisor)
+			var tl postulacion.PostulacionTrustLine
+			tl, err = shim.GetPostulacionTrustLine(ctx.GetStub(), cc.Tipologia.Code, receptor, emisor)
 			if err == shim.ErrStateNotFound {
 				err = postulacion.ErrTransferTrustline
 				fmt.Printf(err.Error())
@@ -167,13 +167,13 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 			}
 		}
 		// Check issuer
-		if utxo.Issuer != issuer {
+		if utxo.Emisor != emisor {
 			err = postulacion.ErrOnlySameIssuerTransfer
 			fmt.Printf(err.Error())
 			return
 		}
 		// Check owner
-		if utxo.Owner != ctx.GetMSPID() {
+		if utxo.Receptor != ctx.GetMSPID() {
 			err = postulacion.ErrOnlyOwnerTransfer
 			fmt.Printf(err.Error())
 			return
@@ -185,7 +185,7 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 			return
 		}
 		// Add value to input amount
-		totalInputAmount += utxo.Value
+		//totalInputAmount += utxo.Value
 
 		err = shim.DeletePostulacion(ctx.GetStub(), cc.Tipologia.Code, utxoID)
 		if err != nil {
@@ -195,39 +195,45 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 		spentUTXO[utxoID] = true
 	}
 
+
+	
 	// Create new outputs
 	var transferUTXO, changeUTXO postulacion.Postulacion
+	/*
+	comendtado
 	if totalInputAmount < amount {
 		err = postulacion.ErrInsufficientTransferFunds
 		fmt.Printf(err.Error())
 		return
 	}
+*/
+	
 	transferUTXO = postulacion.Postulacion{
 		ID:     ctx.GetStub().GetTxID() + ":" + "0",
 		Emisor: emisor,
 		Receptor:  receptor,
-		Value:  amount,
+		//Value:  amount,
 	}
-	err = shim.PutPostulacion(ctx.GetStub(), cc.Currency.Code, transferUTXO)
+	err = shim.PutPostulacion(ctx.GetStub(), cc.Tipologia.Code, transferUTXO)
 	if err != nil {
 		fmt.Printf(err.Error())
 		return
 	}
 
-	changeAmount := totalInputAmount - amount
-	if changeAmount > 0 {
+	//changeAmount := totalInputAmount - amount
+	//if changeAmount > 0 {
 		changeUTXO = postulacion.Postulacion{
 			ID:     ctx.GetStub().GetTxID() + ":" + "1",
-			Issuer: issuer,
-			Owner:  ctx.GetMSPID(),
-			Value:  changeAmount,
+			Emisor: emisor,
+			Receptor:  ctx.GetMSPID(),
+			Puntaje:  puntaje-1,
 		}
 		err = shim.PutPostulacion(ctx.GetStub(), cc.Tipologia.Code, changeUTXO)
 		if err != nil {
 			fmt.Printf(err.Error())
 			return
 		}
-	}
+	//}
 
 	// Set the event payload
 	payload = postulacion.TransferedPayload{
@@ -253,7 +259,7 @@ func (cc *MinvuControlContract) RequestRedemption(ctx CustomTransactionContextIn
 		err = postulacion.ErrRedemptionRequestPending
 		return
 	}
-	if utxo.Owner != ctx.GetMSPID() {
+	if utxo.Emisor != ctx.GetMSPID() {
 		err = postulacion.ErrOnlyOwnerRequestRedemption
 		return
 	}
@@ -265,7 +271,7 @@ func (cc *MinvuControlContract) RequestRedemption(ctx CustomTransactionContextIn
 
 	payload = postulacion.RedemptionRequestedPayload{
 		Requestor:    ctx.GetMSPID(),
-		Redeemer:     utxo.Issuer,
+		Redeemer:     utxo.Emisor,
 		UTXOID:       utxo.ID,
 		TipologiaCode: cc.Tipologia.Code,
 	}
@@ -283,7 +289,7 @@ func (cc *MinvuControlContract) ConfirmRedemption(ctx CustomTransactionContextIn
 		err = postulacion.ErrNoRedemptionRequestToConfirm
 		return
 	}
-	if utxo.Owner != ctx.GetMSPID() {
+	if utxo.Emisor != ctx.GetMSPID() {
 		err = postulacion.ErrOnlyOwnerConfirmRedemption
 		return
 	}
@@ -294,7 +300,7 @@ func (cc *MinvuControlContract) ConfirmRedemption(ctx CustomTransactionContextIn
 
 	payload = postulacion.RedemptionConfirmedPayload{
 		ConfirmedBy:  ctx.GetMSPID(),
-		Redeemer:     utxo.Issuer,
+		Redeemer:     utxo.Emisor,
 		UTXOID:       utxo.ID,
 		TipologiaCode: cc.Tipologia.Code,
 	}
@@ -303,20 +309,20 @@ func (cc *MinvuControlContract) ConfirmRedemption(ctx CustomTransactionContextIn
 }
 
 // SetTrustline can be used to enable or disable receptions of this currency from a specific issuer
-func (cc *MinvuControlContract) SetTrustline(ctx CustomTransactionContextInterface, issuer string, trust bool, limit int) (payload postulacion.TrustlineSetPayload, err error) {
+func (cc *MinvuControlContract) SetTrustline(ctx CustomTransactionContextInterface, emisor string, trust bool, limit int) (payload postulacion.TrustlineSetPayload, err error) {
 	// createCompositeKey with currency code, sender,issuer and value of bool trust
 	// Validate parameters
-	if issuer == "" {
+	if emisor == "" {
 		err = postulacion.ErrTrustlineIssuerRequiered
 		return
 	}
 
 	// Set trustline
-	err = shim.PutCurrencyTrustline(ctx.GetStub(), cc.Tipologia.Code, postulacion.CurrencyTrustline{
+	err = shim.PutPostulacionTrustLine(ctx.GetStub(), cc.Tipologia.Code, postulacion.PostulacionTrustLine{
 		Receptor: ctx.GetMSPID(),
-		Issuer:   issuer,
+		Emisor:   emisor,
 		Trust:    trust,
-		MaxLimit: limit,
+		//MaxLimit: limit,
 	})
 	if err != nil {
 		return
@@ -324,7 +330,7 @@ func (cc *MinvuControlContract) SetTrustline(ctx CustomTransactionContextInterfa
 
 	payload = postulacion.TrustlineSetPayload{
 		Receptor:     ctx.GetMSPID(),
-		Issuer:       issuer,
+		Emisor:       emisor,
 		Trust:        trust,
 		MaxLimit:     limit,
 		TipologiaCode: cc.Tipologia.Code,
