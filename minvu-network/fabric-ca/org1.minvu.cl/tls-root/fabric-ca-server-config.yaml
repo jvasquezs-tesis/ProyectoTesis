@@ -241,7 +241,7 @@ ldap:
 #############################################################################
 affiliations:
   postulacion:
-    - Mint
+    - Insert
     - Transfer
     - RequestRedemption
     - ConfirmRedemption

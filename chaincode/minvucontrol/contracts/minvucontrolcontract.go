@@ -50,7 +50,7 @@ func (cc *MinvuControlContract) GetEvaluateTransactions() []string {
 }
 
 // Mint issues new coins for a specified amount to a specified receptor
-func (cc *MinvuControlContract) Mint(ctx CustomTransactionContextInterface, receptor string,  rutpostulante int,  puntaje float32,  montosubsidiouf float32) (payload postulacion.MintedPayload, err error) {
+func (cc *MinvuControlContract) Insert(ctx CustomTransactionContextInterface, receptor string,  rutpostulante int,  puntaje float32,  montosubsidiouf float32) (payload postulacion.InsertedPayload, err error) {
 	// Validate parameters
 	if montosubsidiouf < 0 {
 		err = postulacion.ErrValidarMontoSubsidioUF
@@ -91,8 +91,8 @@ func (cc *MinvuControlContract) Mint(ctx CustomTransactionContextInterface, rece
 	}
 
 	// Return the event payload
-	payload = postulacion.MintedPayload{
-		Minter:       ctx.GetMSPID(),
+	payload = postulacion.InsertedPayload{
+		Insert:       ctx.GetMSPID(),
 		UTXOID:       utxo.ID,
 		Receptor:     receptor,
 		TipologiaCode: cc.Tipologia.Code,

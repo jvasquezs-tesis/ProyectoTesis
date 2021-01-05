@@ -85,7 +85,7 @@ var CurrencyEventNames = map[string]string{
 }
 */
 var PostulacionEventNames = map[string]string{
-	"Mint":              "Minted",   // emision del token 
+	"Insert":              "Inserted",   // emision del token 
 	"Transfer":          "Transfered", // transferencia 
 	"RequestRedemption": "RedemptionRequested", // solicitar intercambio de token por efectivo
 	"ConfirmRedemption": "RedemptionConfirmed", // destruir token en la red
@@ -106,8 +106,8 @@ var CurrencyEventNames = mapa [cadena] cadena {
 */
 
 // MintedPayload is the payload of the Minted Events
-type MintedPayload struct {
-	Minter       string `json:"minter"`
+type InsertedPayload struct {
+	Insert       string `json:"insert"`
 	UTXOID       string `json:"UtxoId"`
 	Receptor     string `json:"receptor"`
 	TipologiaCode string `json:"tipologiacode"`
@@ -204,11 +204,11 @@ escriba TrustlineSetPayload struct {
 
 // Errores de Negocio
 var (
-	ErrValidarPuntaje               = errors.New("El puntaje debe ser mayor a 0 y menor o igual a 100")
+	ErrValidarPuntaje               = errors.New("El puntaje debe ser mayor igual a 0 y menor o igual a 100")
 	ErrValidarMontoSubsidioUF       = errors.New("El Monto del subsidio debe ser mayor a 0")
 	ErrRutPostulanteRequerido       = errors.New("Debe ingresar un rut del postulante")
 	ErrReceptorRequerido            = errors.New("El MSP receptor debe especificarse para continuar con la postulacion")
-	ErrMintReceiverRequiered        = errors.New("The receiving MSP should be specified to mint currency to")
+	ErrInsertReceiverRequiered        = errors.New("The receiving MSP should be specified to mint currency to")
 	ErrTransferEmptyUTXOSet         = errors.New("The set of UTXO should contain at least one UTXO to transfer")
 	ErrDoubleSpentTransfer          = errors.New("The same UTXO can not be spent twice")
 	ErrPendingRedemptionTransfer    = errors.New("A UTXO that is already requested to be redeemed can not be transfered")

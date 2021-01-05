@@ -14,16 +14,16 @@ func main() {
 	CCHContract.TransactionContextHandler = new(contracts.CustomTransactionContext)
 	CCHContract.BeforeTransaction = contracts.BeforeTransaction
 	CCHContract.AfterTransaction = contracts.AfterTransaction
-	CCHContract.Currency.Name = "Construccion Conjunto Habitacional"
-	CCHContract.Currency.Code = "CCH"
+	CCHContract.Tipologia.Nombre = "Construccion Conjunto Habitacional"
+	CCHContract.Tipologia.Code = "CCH"
 	CCHContract.Name = "CCHTipologiaContract"
 	
 	CSRContract := new(contracts.MinvuControlContract)
 	CSRContract.TransactionContextHandler = new(contracts.CustomTransactionContext)
 	CSRContract.BeforeTransaction = contracts.BeforeTransaction
 	CSRContract.AfterTransaction = contracts.AfterTransaction
-	CSRContract.Currency.Name = "Construccion Sitio Residente"
-	CSRContract.Currency.Code = "CSR"
+	CSRContract.Tipologia.Nombre = "Construccion Sitio Residente"
+	CSRContract.Tipologia.Code = "CSR"
 	CSRContract.Name = "CSRTipologiaContract"
 
 	fmt.Printf("Create chaincode from smart contracts")
