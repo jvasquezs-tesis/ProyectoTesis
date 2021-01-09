@@ -244,10 +244,7 @@ ldap:
 #############################################################################
 affiliations:
   postulacion:
-    - Transfer
-    - RequestRedemption
-    - ConfirmRedemption
-    - SetTrustline
+    - serviu
 
 #############################################################################
 #  Signing section

@@ -352,7 +352,7 @@ cd scripts/ && ./intca.sh
 
 ´´´shell
 
-export CSR_NAMES_ORG1="C=CO,ST=Antioquia,L=Medellin,O=Org1,OU=Hyperledger Fabric" 
+export CSR_NAMES_ORG1="C=CL,ST=Santiago,L=Santiago,O=Org1,OU=Hyperledger Fabric"
 
 export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin
 
@@ -445,7 +445,7 @@ export CSR_NAMES_ORG1="C=CL,ST=Santiago,L=Santiago,O=Org1,OU=Hyperledger Fabric"
 
 export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin
 
-fabric-ca-client register --id.name user1@org1.minvu.cl --id.secret user1pw --id.type client --id.affiliation postulacion.Mint -u http://admin:adminpw@localhost:7056
+fabric-ca-client register --id.name user1@org1.minvu.cl --id.secret user1pw --id.type client --id.affiliation postulacion.inicio -u http://admin:adminpw@localhost:7056
 
 export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/user1@org1.minvu.cl
 
@@ -456,3 +456,6 @@ fabric-ca-client enroll -u http://user1@org1.minvu.cl:user1pw@localhost:7056 --c
 instalar chaincode , posicionarse dentro de 
 
 minvu-network-scripts
+
+
+openssl x509 -in ca-cert.pem -text -noout

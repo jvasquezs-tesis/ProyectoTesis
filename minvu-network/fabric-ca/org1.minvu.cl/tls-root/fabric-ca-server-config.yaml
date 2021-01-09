@@ -241,11 +241,7 @@ ldap:
 #############################################################################
 affiliations:
   postulacion:
-    - Insert
-    - Transfer
-    - RequestRedemption
-    - ConfirmRedemption
-    - SetTrustline
+    - egr
 
 #############################################################################
 #  Signing section

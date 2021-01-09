@@ -28,6 +28,7 @@ func BeforeTransaction(ctx CustomTransactionContextInterface) (err error) {
 		err = postulacion.ErrNoChannelPermissions
 		return
 	}
+
 	// GetMSPID and set it to tx context
 	msp, err := ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
@@ -50,7 +51,20 @@ func (cc *MinvuControlContract) GetEvaluateTransactions() []string {
 }
 
 // Mint issues new coins for a specified amount to a specified receptor
-func (cc *MinvuControlContract) Insert(ctx CustomTransactionContextInterface, receptor string,  rutpostulante int,  puntaje float32,  montosubsidiouf float32) (payload postulacion.InsertedPayload, err error) {
+func (cc *MinvuControlContract) Insert(ctx CustomTransactionContextInterface, rutpostulante int, puntaje float32, montosubsidiouf float32) (payload postulacion.InsertedPayload, err error) {
+
+	//validacion remitente de la transaccion
+	hasOUPermission, err := cid.HasOUValue(ctx.GetStub(),"egr")
+
+	if err != nil {
+		return
+	}
+
+	if !hasOUPermission {
+		err = postulacion.ErrNoRolAsigando
+		return 
+	}
+	
 	// Validate parameters
 	if montosubsidiouf < 0 {
 		err = postulacion.ErrValidarMontoSubsidioUF
@@ -63,23 +77,23 @@ func (cc *MinvuControlContract) Insert(ctx CustomTransactionContextInterface, re
 	}
 
 	// Check decimals of amount
-	if receptor == ""{
+	/*
+	if receptor != ""{
 		err = postulacion.ErrReceptorRequerido
 		return
 	}
 
-/*
 	// Check decimals of amount
 	if rutpostulante == ""{
 		err = postulacion.ErrRutPostulanteRequerido
 		return
 	}
-*/
+	*/
 	// Mint a new UTXO
 	utxo := postulacion.Postulacion{
-		ID:     ctx.GetStub().GetTxID() + ":" + "0",
-		Emisor: ctx.GetMSPID(),
-		Receptor        :receptor,
+		ID				:ctx.GetStub().GetTxID() + ":" + "0",
+		Emisor			:ctx.GetMSPID(),
+		Receptor        :"", // vacio en instancia de insercion por parte de la EGR
 		RutPostulante   :rutpostulante,
 		Puntaje			:puntaje,
 		MontoSubsidioUF :montosubsidiouf,
@@ -92,10 +106,10 @@ func (cc *MinvuControlContract) Insert(ctx CustomTransactionContextInterface, re
 
 	// Return the event payload
 	payload = postulacion.InsertedPayload{
-		Insert:       ctx.GetMSPID(),
-		UTXOID:       utxo.ID,
-		Receptor:     receptor,
-		TipologiaCode: cc.Tipologia.Code,
+		Insert			:ctx.GetMSPID(),
+		UTXOID			:utxo.ID,
+		Receptor		:"",
+		TipologiaCode	:cc.Tipologia.Code,
 	}
 	//ctx.SetEventPayload(payload)
 	return
@@ -309,7 +323,7 @@ func (cc *MinvuControlContract) ConfirmRedemption(ctx CustomTransactionContextIn
 }
 
 // SetTrustline can be used to enable or disable receptions of this currency from a specific issuer
-func (cc *MinvuControlContract) SetTrustline(ctx CustomTransactionContextInterface, emisor string, trust bool, limit int) (payload postulacion.TrustlineSetPayload, err error) {
+func (cc *MinvuControlContract) SetTrustline(ctx CustomTransactionContextInterface, emisor string, trust bool) (payload postulacion.TrustlineSetPayload, err error) {
 	// createCompositeKey with currency code, sender,issuer and value of bool trust
 	// Validate parameters
 	if emisor == "" {
@@ -332,7 +346,6 @@ func (cc *MinvuControlContract) SetTrustline(ctx CustomTransactionContextInterfa
 		Receptor:     ctx.GetMSPID(),
 		Emisor:       emisor,
 		Trust:        trust,
-		MaxLimit:     limit,
 		TipologiaCode: cc.Tipologia.Code,
 	}
 	//ctx.SetEventPayload(payload)

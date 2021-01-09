@@ -28,10 +28,27 @@ function issueCertificatesWithAffiliation() {
     csr_names=$8
     csr_hosts=$9
 
-
-    # register identity with CA admin
+  # register identity with CA admin
     export FABRIC_CA_CLIENT_HOME=../fabric-ca/$org/$ca/clients/admin
-    fabric-ca-client register --id.name $id_name --id.secret $id_secret --id.type $id_type --id.affiliation $id_affiliation -u http://admin:adminpw@localhost:$ca_port
+
+    if [ $org = "org1.minvu.cl" ]; 
+    then
+    echo "affiliation org1"
+        fabric-ca-client register --id.name $id_name --id.secret $id_secret --id.type $id_type --id.affiliation postulacion.egr -u http://admin:adminpw@localhost:$ca_port
+    fi
+
+    if [ $org = "org2.minvu.cl" ]; 
+    then
+      echo "affiliation org2"
+        fabric-ca-client register --id.name $id_name --id.secret $id_secret --id.type $id_type --id.affiliation postulacion.serviu -u http://admin:adminpw@localhost:$ca_port
+    fi
+
+    if [ $org = "org3.minvu.cl" ]; 
+    then
+      echo "affiliation org3"
+        fabric-ca-client register --id.name $id_name --id.secret $id_secret --id.type $id_type --id.affiliation postulacion.dph -u http://admin:adminpw@localhost:$ca_port
+    fi
+    
     # enroll registered identity
     export FABRIC_CA_CLIENT_HOME=../fabric-ca/$org/$ca/clients/$id_name
     fabric-ca-client enroll -u http://$id_name:$id_secret@localhost:$ca_port --csr.names "$csr_names" --csr.hosts "$csr_hosts"
@@ -70,6 +87,15 @@ issueTLSCertificates tls-int 7057 org1.minvu.cl peer0.org1.minvu.cl peerpw peer 
 # issue certificates for orderer node identity and for orderer server tls
 issueCertificates int 7056 org1.minvu.cl orderer.org1.minvu.cl ordererpw orderer "$CSR_NAMES_ORG1" ""
 issueTLSCertificates tls-int 7057 org1.minvu.cl orderer.org1.minvu.cl ordererpw orderer "$CSR_NAMES_ORG1" "orderer.org1.minvu.cl,localhost"
+
+
+#export CSR_NAMES_ORG1="C=CL,ST=Santiago,L=Santiago,O=Org1,OU=Hyperledger Fabric"
+#export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin
+#fabric-ca-client register --id.name user1@org1.minvu.cl --id.secret user1pw --id.type client --id.affiliation postulacion.inicio -u http://admin:adminpw@localhost:7056
+#export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/user1@org1.minvu.cl
+#fabric-ca-client enroll -u http://user1@org1.minvu.cl:user1pw@localhost:7056 --csr.names "$CSR_NAMES_ORG1"
+
+
 
 # Org2
 export CSR_NAMES_ORG2="C=CL,ST=Santiago,L=Santiago,O=Org2,OU=Hyperledger Fabric"

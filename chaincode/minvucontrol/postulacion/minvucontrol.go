@@ -2,35 +2,15 @@ package postulacion
 
 import "errors"
 
-/*
-// Currency specifies a currency // monedas
-type Currency struct {
-	Name     string `json:"name"`
-	Code     string `json:"code"`
-	Decimals int    `json:"decimals"`
-}
-*/
-
 type Tipologia struct {
 	Nombre     string `json:"nombre"`
 	Code     string `json:"code"`
 }
 
-/*
-// CurrencyUTXO is an unspent amount of a certain currency
-type CurrencyUTXO struct {
-	ID                string `json:"id"`
-	Issuer            string `json:"issuer"`
-	Owner             string `json:"owner"`
-	Value             int    `json:"value"`
-	RedemptionPending bool   `json:"redemptionPending"`
-}
-*/
-// CurrencyUTXO is an unspent amount of a certain currency
 type Postulacion struct {
 	ID                string  `json:"id"`
 	Emisor            string  `json:"emisor"` // siempre EGR al inicio.
-	Receptor          string  `json:"receptor"`
+	Receptor          string  `json:"receptor"` // siempre vacio al inicio
 	RutPostulante     int     `json:"rutpostulante"`
 	Puntaje			  float32 `json:"puntaje"`
 	MontoSubsidioUF   float32 `json:"montosubsidiouf"`
@@ -84,12 +64,14 @@ var CurrencyEventNames = map[string]string{
 	"SetTrustline":      "TrustlineSet",
 }
 */
+
+//Especifica los nombres de los eventos que deben activarse 
 var PostulacionEventNames = map[string]string{
-	"Insert":              "Inserted",   // emision del token 
-	"Transfer":          "Transfered", // transferencia 
-	"RequestRedemption": "RedemptionRequested", // solicitar intercambio de token por efectivo
-	"ConfirmRedemption": "RedemptionConfirmed", // destruir token en la red
-	"SetTrustline":      "TrustlineSet", // quien permitio el envio o bloqueo 
+	"Insert"			: "Inserted",   			// emision del token 
+	"Transfer"			: "Transfered", 			// transferencia 
+	"RequestRedemption" : "RedemptionRequested", 	// solicitar intercambio de token por efectivo
+	"ConfirmRedemption" : "RedemptionConfirmed", 	// destruir token en la red
+	"SetTrustline"		: "TrustlineSet", 			// quien permitio el envio o bloqueo 
 }
 
 /*
@@ -187,7 +169,7 @@ type TrustlineSetPayload struct {
 	Receptor     string `json:"receptor"`
 	Emisor       string `json:"emisor"`
 	Trust        bool   `json:"trust"`
-	MaxLimit     int    `json:"maxLimit"`
+	//MaxLimit     int    `json:"maxLimit"`
 	TipologiaCode string `json:"tipologiaCode"`
 }
 
@@ -208,7 +190,9 @@ var (
 	ErrValidarMontoSubsidioUF       = errors.New("El Monto del subsidio debe ser mayor a 0")
 	ErrRutPostulanteRequerido       = errors.New("Debe ingresar un rut del postulante")
 	ErrReceptorRequerido            = errors.New("El MSP receptor debe especificarse para continuar con la postulacion")
-	ErrInsertReceiverRequiered        = errors.New("The receiving MSP should be specified to mint currency to")
+	ErrNoRolAsigando           	    = errors.New("La organizacion no esta autorizada para insertar la postulacion")
+
+	ErrInsertReceiverRequiered      = errors.New("The receiving MSP should be specified to mint currency to")
 	ErrTransferEmptyUTXOSet         = errors.New("The set of UTXO should contain at least one UTXO to transfer")
 	ErrDoubleSpentTransfer          = errors.New("The same UTXO can not be spent twice")
 	ErrPendingRedemptionTransfer    = errors.New("A UTXO that is already requested to be redeemed can not be transfered")
