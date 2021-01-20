@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	// ErrStateNotFound is an error that is thrown when a value is not found for a key in the World State
-	ErrStateNotFound = errors.New("State was not found")
+	// ErrStateNotFound es un error que se produce cuando no se encuentra un valor para una clave en el estado mundial
+	ErrEstadoNoEncontrado = errors.New("No se encontro el estado")
 )
 
 // State represents an entry in the World State
@@ -29,7 +29,7 @@ func GetState(stub shim.ChaincodeStubInterface, key string, v interface{}) (err 
 		return
 	}
 	if bytes == nil {
-		err = ErrStateNotFound
+		err = ErrEstadoNoEncontrado
 		return
 	}
 

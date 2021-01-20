@@ -22,9 +22,9 @@ npx caliper bind --caliper-bind-sut fabric:latest-v2 --caliper-bind-sdk latest-v
 ```sh
 npx caliper launch master \
     --caliper-workspace . \
-    --caliper-benchconfig benchmarks/scenario/currency-lifecycle/config.yaml \
+    --caliper-benchconfig benchmarks/scenario/postulacion-lifecycle/config.yaml \
     --caliper-networkconfig networks/minvu-network-local.yaml \
     --caliper-flow-only-test \
     --caliper-fabric-gateway-usegateway \
-     --caliper-fabric-gateway-discovery
+    --caliper-fabric-gateway-discovery
 ```

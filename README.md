@@ -12,12 +12,21 @@ REQUISITOS PREVIOS SOBRE SISTEMA OPERATIVO UBUNTU VERSIÓN 20.04.1 LTS
 ```shell
   sudo apt install curl
 ```
--Instalar docker
 
+-Instalar docker
+```shell
   sudo apt install docker 
+```
+Instalar node v10.19.0
+```shell
+  sudo apt install nodejs
+```
+Instalar nodee-gyp v6.1.0
+```shell
+  sudo apt install node-gyp
+```
 
 -Instalar docker-compose
-
 ```shell
   sudo apt install docker 
 ```
@@ -459,3 +468,28 @@ minvu-network-scripts
 
 
 openssl x509 -in ca-cert.pem -text -noout
+
+
+crear carpeta caliper.
+
+instalar caliper-cli
+
+sudo apt install npm
+
+
+crear paquete json del proyecto
+npm init -y
+
+npm install --only=prod @hyperledger/caliper-cli@0.3.2
+
+
+descargar adaptar para conectarse con fabric
+npx caliper bind --caliper-bind-sut fabric:latest-v2 --caliper-bind-sdk latest-v2 --caliper-fabric-gateway-usegateway --caliper-flow-only-test
+
+
+
+
+
+
+
+

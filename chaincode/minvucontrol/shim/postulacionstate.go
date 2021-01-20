@@ -90,6 +90,7 @@ func GetHistoryForPostulacionID(stub shim.ChaincodeStubInterface, tipologiaCode 
 	}
 
 	historyBuffer, err := GetHistoryForKey(stub, key)
+	//historyBuffer, err := stub.GetHistoryForKey(key)
 	if err != nil {
 		return
 	}

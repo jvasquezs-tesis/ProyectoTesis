@@ -3,186 +3,64 @@ package postulacion
 import "errors"
 
 type Tipologia struct {
-	Nombre     string `json:"nombre"`
-	Code     string `json:"code"`
+	Nombre string `json:"nombre"`
+	Code   string `json:"code"`
 }
 
 type Postulacion struct {
 	ID                string  `json:"id"`
-	Emisor            string  `json:"emisor"` // siempre EGR al inicio.
-	Receptor          string  `json:"receptor"` // siempre vacio al inicio
+	Emisor            string  `json:"emisor"` 
+	Receptor          string  `json:"receptor"`
 	RutPostulante     int     `json:"rutpostulante"`
 	Puntaje			  float32 `json:"puntaje"`
 	MontoSubsidioUF   float32 `json:"montosubsidiouf"`
-	RedemptionPending bool   `json:"redemptionPending"`
+	EstadoPostulante  string  `json:"estadopostulante"`
+	EstadoExpediente  string  `json:"estadoexpediente"`
 }
 
-/*
-// MonedaUTXO es una cantidad no gastada de una determinada moneda
-type CurrencyUTXO struct {
-	Cadena de identificación `json:" id "`
-	Cadena de emisor `json:" emisor "`
-	Cadena de propietario `json:" propietario "`
-	Valor int `json:" valor "`
-	RedemptionPending bool `json:" redemptionPending "`
-	}
-*/
-// CurrencyTrustline sets if an organization trusts an issuer to receive coins from
-/*type CurrencyTrustline struct {
-	Receiver string `json:"receiver"`
-	Issuer   string `json:"issuer"`
-	Trust    bool   `json:"trust"`
-	MaxLimit int    `json:"maxLimit"`
-}
-*/
-
-// CurrencyTrustline sets if an organization trusts an issuer to receive coins from
+//PostulacionTrustLine establece si una organización confía en un emisor para recibir transacciones
 type PostulacionTrustLine struct {
 	Receptor string `json:"receptor"`
 	Emisor   string `json:"emisor"`
 	Trust    bool   `json:"trust"`
 }
 
-
-/*
-// CurrencyTrustline establece si una organización confía en un emisor para recibir monedas de
-type CurrencyTrustline struct {
-	Cadena de receptor `json:" receptor "`
-	Cadena de emisor `json:" emisor "`
-	Confíe en bool `json:" confianza "`
-	MaxLimit int `json:" maxLimit "`
-	}
-*/
-
-/*
-// CurrencyEventNames specifies the names of the events that should be fired after the txs
-var CurrencyEventNames = map[string]string{
-	"Mint":              "Minted",
-	"Transfer":          "Transfered",
-	"RequestRedemption": "RedemptionRequested",
-	"ConfirmRedemption": "RedemptionConfirmed",
-	"SetTrustline":      "TrustlineSet",
-}
-*/
-
-//Especifica los nombres de los eventos que deben activarse 
+//Específica los eventos del chaincode
 var PostulacionEventNames = map[string]string{
-	"Insert"			: "Inserted",   			// emision del token 
+	"Insert"			: "Inserted",   			// emisión del token 
 	"Transfer"			: "Transfered", 			// transferencia 
-	"RequestRedemption" : "RedemptionRequested", 	// solicitar intercambio de token por efectivo
-	"ConfirmRedemption" : "RedemptionConfirmed", 	// destruir token en la red
-	"SetTrustline"		: "TrustlineSet", 			// quien permitio el envio o bloqueo 
+	"SetTrustline"		: "TrustlineSet", 			// Autorización de transacción entre organizaciones ¿De quien acepto transferencias ?
 }
 
-/*
-
-// CurrencyEventNames especifica los nombres de los eventos que deben activarse después de los txs
-var CurrencyEventNames = mapa [cadena] cadena {
-"Mint": "Acuñado",
-"Transferir": "Transferido",
-"RequestRedemption": "RedemptionRequested",
-"ConfirmRedemption": "RedemptionConfirmed",
-"SetTrustline": "TrustlineSet",
-}
-
-*/
-
-// MintedPayload is the payload of the Minted Events
+//InsertedPayload es la carga útil del evento Inserted 
 type InsertedPayload struct {
 	Insert       string `json:"insert"`
-	UTXOID       string `json:"UtxoId"`
-	Receptor     string `json:"receptor"`
+	POSID       string `json:"PosId"`
 	TipologiaCode string `json:"tipologiacode"`
+	Receptor          string  `json:"receptor"`
+	RutPostulante     int     `json:"rutpostulante"`
+	Puntaje			  float32 `json:"puntaje"`
+	MontoSubsidioUF   float32 `json:"montosubsidiouf"`
+	EstadoPostulante  string  `json:"estadopostulante"`
+	EstadoExpediente  string  `json:"estadoexpediente"`
 }
-
-/*
-// MintedPayload es la carga útil de Minted Events
-type MintedPayload struct {
-	Cadena de minter `json:" minter "`
-	Cadena UTXOID `json:" UtxoId "`
-	Cadena de receptor `json:" receptor "`
-	CurrencyCode cadena `json:" currencyCode "`
-	}
-*/
 
 // TransferedPayload is the payload of the Transfered Events
 type TransferedPayload struct {
-	TransferedBy string `json:"transferedBy"`
-	//SpentUTXOIDSet   []string `json:"spentUtxoIdSet"`
-	ChangeUTXOID     string `json:"changeUtxoId"`
-	TransferedUTXOID string `json:"transferedUtxoId"`
-	Receptor         string `json:"recepetor"`
-	TipologiaCode     string `json:"TipologiaCode"`
+	TransferedBy 	string `json:"transferedBy"`
+	//ChangePOSID     string `json:"changePosId"`
+	TransferedPOSID string `json:"transferedPosId"`
+	Receptor        string `json:"recepetor"`
+	TipologiaCode   string `json:"TipologiaCode"`
 }
 
-/*
-// TransferedPayload es la carga útil de los eventos transferidos
-type TransferedPayload struct {
-Transferido por cadena `json:" transferido por "`
-// SpentUTXOIDSet [] string `json:" gastadoUtxoIdSet "`
-Cadena ChangeUTXOID `json:" changeUtxoId "`
-TransferidoUTXOID cadena `json:" transferidoUtxoId "`
-Cadena de receptor `json:" receptor "`
-CurrencyCode cadena `json:" currencyCode "`
-}
-*/
-
-// RedemptionRequestedPayload is the payload of the RedemptionRequested Events
-type RedemptionRequestedPayload struct {
-	Requestor    string `json:"requestor"`
-	Redeemer     string `json:"redeemer"`
-	UTXOID       string `json:"utxoID"`
-	TipologiaCode string `json:"tipologiaCode"`
-}
-
-/*
-// RedemptionRequestedPayload es la carga útil de los eventos RedemptionRequested
-type RedemptionRequestedPayload struct {
-Cadena de solicitante `json:" solicitante "`
-Cadena de redentor `json:" redentor "`
-Cadena UTXOID `json:" utxoID "`
-CurrencyCode cadena `json:" currencyCode "`
-}
-*/
-
-// RedemptionConfirmedPayload is the payload of the RedemptionConfirmed Events
-type RedemptionConfirmedPayload struct {
-	ConfirmedBy  string `json:"confirmedBy"`
-	Redeemer     string `json:"redeemer"`
-	UTXOID       string `json:"utxoID"`
-	TipologiaCode string `json:"tipologiaCode"`
-}
-
-/*
-
-// RedemptionConfirmedPayload es la carga útil de los eventos RedemptionConfirmed
-type RedemptionConfirmedPayload struct {
-ConfirmedBy string `json:" confirmadoBy "`
-Cadena de redentor `json:" redentor "`
-Cadena UTXOID `json:" utxoID "`
-CurrencyCode cadena `json:" currencyCode "`
-}
-
-*/
 // TrustlineSetPayload is the payload of the TrustlineSet Events
 type TrustlineSetPayload struct {
-	Receptor     string `json:"receptor"`
-	Emisor       string `json:"emisor"`
-	Trust        bool   `json:"trust"`
-	//MaxLimit     int    `json:"maxLimit"`
+	Receptor      string `json:"receptor"`
+	Emisor        string `json:"emisor"`
+	Trust         bool   `json:"trust"`
 	TipologiaCode string `json:"tipologiaCode"`
 }
-
-/*
-// TrustlineSetPayload es la carga útil de TrustlineSet Events
-escriba TrustlineSetPayload struct {
-	Cadena de receptor `json:" receptor "`
-	Cadena de emisor `json:" emisor "`
-	Confíe en bool `json:" confianza "`
-	MaxLimit int `json:" maxLimit "`
-	CurrencyCode cadena `json:" currencyCode "`
-	}
-*/
 
 // Errores de Negocio
 var (
@@ -191,39 +69,21 @@ var (
 	ErrRutPostulanteRequerido       = errors.New("Debe ingresar un rut del postulante")
 	ErrReceptorRequerido            = errors.New("El MSP receptor debe especificarse para continuar con la postulacion")
 	ErrNoRolAsigando           	    = errors.New("La organizacion no esta autorizada para insertar la postulacion")
+	ErrTransferirTrustline          = errors.New("El receptor de una transaccion debe confiar en el emisor.")
+	ErrTransferVacioPOSIDSet        = errors.New("El conjunto de POSID debe contener al menos una postulacion para transferir")
+	ErrDoblePostulacionTransferida  = errors.New("La misma postulacion no puede ser transferida dos veces")
+	SoloTransferenciaMismoEmisor    = errors.New("La postulacion a transeferir debe ser de propiedad del emisor")
+	ErrEnvioPostulacionCreacion 	= errors.New("En estado Creacion solo la EGR puede transferir")
+	ErrEnvioPostulacionEnviado 		= errors.New("En estado Enviado solo SERVIU puede transferir")
+	ErrNoChannelPermissions         = errors.New("El remitente de la transaccion no tiene permisos en este canal")
+
+	Err1            = errors.New("Ero1")
+	Err2            = errors.New("Eros2")
+	Err3            = errors.New("Eros3")
 
 	ErrInsertReceiverRequiered      = errors.New("The receiving MSP should be specified to mint currency to")
-	ErrTransferEmptyUTXOSet         = errors.New("The set of UTXO should contain at least one UTXO to transfer")
-	ErrDoubleSpentTransfer          = errors.New("The same UTXO can not be spent twice")
-	ErrPendingRedemptionTransfer    = errors.New("A UTXO that is already requested to be redeemed can not be transfered")
 	ErrOnlyOwnerTransfer            = errors.New("Only the owner of a UTXO can transfer it")
 	ErrInsufficientTransferFunds    = errors.New("The total input value of the UTXO set to transfer should be sufficient to cover the specified amount")
-	ErrOnlySameIssuerTransfer       = errors.New("The UTXO's in the input set should all have the same issuer")
-	ErrNoChannelPermissions         = errors.New("The transaction sender does not have permissions on this channel")
 	ErrTrustlineIssuerRequiered     = errors.New("The issuer MSP should specified to set a trustline")
-	ErrTransferTrustline            = errors.New("The receiver of a transfer should trust the issuer of the transfered coins")
-	ErrRedemptionRequestPending     = errors.New("The redemption of the UTXO has already been requested")
-	ErrOnlyOwnerRequestRedemption   = errors.New("Only the owner of a UTXO con request its redemption")
-	ErrNoRedemptionRequestToConfirm = errors.New("The UTXO should have a pending redemption request to be able to confirm the redemption")
 	ErrOnlyOwnerConfirmRedemption   = errors.New("Only the owner of a UTXO can confirm its redemption")
 )
-
-/*
-var (
-	ErrNegativeMintAmount = errors.New ("La cantidad para acuñar una moneda debe ser un valor positivo")
-	ErrMintReceiverRequiered = errors.New ("El MSP receptor debe especificarse para acuñar moneda")
-	ErrTransferEmptyUTXOSet = errors.New ("El conjunto de UTXO debe contener al menos un UTXO para transferir")
-	ErrDoubleSpentTransfer = errors.New ("El mismo UTXO no se puede gastar dos veces")
-	ErrPendingRedemptionTransfer = errors.New ("No se puede transferir un UTXO que ya se solicitó para canjear")
-	ErrOnlyOwnerTransfer = errors.New ("Solo el propietario de un UTXO puede transferirlo")
-	ErrInsufficientTransferFunds = errors.New ("El valor total de entrada del UTXO configurado para transferir debería ser suficiente para cubrir la cantidad especificada")
-	ErrOnlySameIssuerTransfer = errors.New ("Los UTXO en el conjunto de entrada deben tener el mismo emisor")
-	ErrNoChannelPermissions = errors.New ("El remitente de la transacción no tiene permisos en este canal")
-	ErrTrustlineIssuerRequiered = errors.New ("El MSP emisor debe especificar para establecer una línea de confianza")
-	ErrTransferTrustline = errors.New ("El receptor de una transferencia debe confiar en el emisor de las monedas transferidas")
-	ErrRedemptionRequestPending = errors.New ("Ya se ha solicitado el canje del UTXO")
-	ErrOnlyOwnerRequestRedemption = errors.New ("Solo el propietario de un UTXO con solicita su canje")
-	ErrNoRedemptionRequestToConfirm = errors.New ("El UTXO debe tener una solicitud de canje pendiente para poder confirmar el canje")
-	ErrOnlyOwnerConfirmRedemption = errors.New ("Solo el propietario de un UTXO puede confirmar su canje")
-	)
-*/

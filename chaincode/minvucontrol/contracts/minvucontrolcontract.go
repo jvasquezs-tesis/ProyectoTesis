@@ -50,276 +50,176 @@ func (cc *MinvuControlContract) GetEvaluateTransactions() []string {
 	return []string{"GetHistoryOfUTXO", "QueryCouchDB"}
 }
 
-// Mint issues new coins for a specified amount to a specified receptor
+// Inserta una nueva postulación, tarea solo para la EGR 
 func (cc *MinvuControlContract) Insert(ctx CustomTransactionContextInterface, rutpostulante int, puntaje float32, montosubsidiouf float32) (payload postulacion.InsertedPayload, err error) {
 
-	//validacion remitente de la transaccion
+	//validacion remitente de la transacción, solo la afiliacion EGR esta autorizada para la insercion d
 	hasOUPermission, err := cid.HasOUValue(ctx.GetStub(),"egr")
 
 	if err != nil {
 		return
 	}
-
 	if !hasOUPermission {
 		err = postulacion.ErrNoRolAsigando
 		return 
 	}
 	
-	// Validate parameters
+	// monto de subsidio debe ser mayor a 0
 	if montosubsidiouf < 0 {
 		err = postulacion.ErrValidarMontoSubsidioUF
 		return
 	}
-
-	if puntaje < 0 || puntaje > 100{
+	// puntaje del postulante debe ser mayor a 0 y menor o igual a 100
+	if puntaje < 0 || puntaje >= 100{
 		err = postulacion.ErrValidarPuntaje
 		return 
 	}
 
-	// Check decimals of amount
-	/*
-	if receptor != ""{
-		err = postulacion.ErrReceptorRequerido
-		return
-	}
-
-	// Check decimals of amount
-	if rutpostulante == ""{
-		err = postulacion.ErrRutPostulanteRequerido
-		return
-	}
-	*/
-	// Mint a new UTXO
-	utxo := postulacion.Postulacion{
+	// Llenar estructura postulacion a insertar
+	ObjetoPostulacion := postulacion.Postulacion{
 		ID				:ctx.GetStub().GetTxID() + ":" + "0",
 		Emisor			:ctx.GetMSPID(),
-		Receptor        :"", // vacio en instancia de insercion por parte de la EGR
+		Receptor        :"", // No existe receptor en proceso de inserción
 		RutPostulante   :rutpostulante,
 		Puntaje			:puntaje,
 		MontoSubsidioUF :montosubsidiouf,
+		EstadoExpediente:"Creacion", // el primer estado del expediente es creación
+		EstadoPostulante:"Inscrito", // el primer estado del postulante es inscrito
 	}
 
-	err = shim.PutPostulacion(ctx.GetStub(), cc.Tipologia.Code, utxo)
+	// insertar postulación
+	err = shim.PutPostulacion(ctx.GetStub(), cc.Tipologia.Code, ObjetoPostulacion)
 	if err != nil {
 		return
 	}
 
-	// Return the event payload
+	// registros retornados de la nueva inserción través del evento Insertedpayload
 	payload = postulacion.InsertedPayload{
 		Insert			:ctx.GetMSPID(),
-		UTXOID			:utxo.ID,
-		Receptor		:"",
+		POSID			:ObjetoPostulacion.ID,
 		TipologiaCode	:cc.Tipologia.Code,
+		Receptor        :"",
+		RutPostulante   :rutpostulante,
+		Puntaje			:puntaje,
+		MontoSubsidioUF :montosubsidiouf,
+		EstadoExpediente:"Creacion",
+		EstadoPostulante:"Inscrito", 
 	}
-	//ctx.SetEventPayload(payload)
 	return
 }
 
-// Transfer transfers a specified amount of the utxo set to a specified receptor
-func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, utxoIDSet []string, receptor string,  rutpostulante int,  puntaje float32,  montosubsidiouf float32) (payload postulacion.TransferedPayload, err error) {
-	// Validate parameters
-	if len(utxoIDSet) == 0 {
-		err = postulacion.ErrTransferEmptyUTXOSet
+//Transfer, transfiere una postulación a una organización específica
+func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, posIDSet string, receptor string) (payload postulacion.TransferedPayload, err error) {
+	
+	//variables 
+	var emisor string
+	var ObjetoPostulacion postulacion.Postulacion
+	var transferPostulacion postulacion.Postulacion
+	// Validar que se ingrese por lo menos una postulacion a transferir
+	if posIDSet == "" {
+		err = postulacion.ErrTransferVacioPOSIDSet
 		fmt.Printf(err.Error())
 		return
 	}
-
-	// Validate parameters
-	if montosubsidiouf < 0 {
-		err = postulacion.ErrValidarMontoSubsidioUF
-		return
-	}
-
-	if puntaje < 0 || puntaje > 100{
-		err = postulacion.ErrValidarPuntaje
-		return 
-	}
-
-	// Check decimals of amount
+	// Se debe agregar un receptor
 	if receptor == ""{
 		err = postulacion.ErrReceptorRequerido
 		return
 	}
-
-	// Validate and spend the UTXO set
-	//totalInputAmount := 0
-	spentUTXO := make(map[string]bool)
-	var emisor string
-	for i, utxoID := range utxoIDSet {
-		// Check duplicate ID in utxo set
-		if spentUTXO[utxoID] {
-			err = postulacion.ErrDoubleSpentTransfer
-			fmt.Printf(err.Error())
-			return
-		}
-		// Obtain UTXO from state
-		var utxo postulacion.Postulacion
-		utxo, err = shim.GetPostulacionByID(ctx.GetStub(), cc.Tipologia.Code, utxoID)
-		if err != nil {
-			fmt.Printf(err.Error())
-			return
-		}
-		// Set issuer of the first utxo in the set
-		if i == 0 {
-			emisor = utxo.Emisor
-			// Check if the receptor accepts coins from this issuer
-			var tl postulacion.PostulacionTrustLine
-			tl, err = shim.GetPostulacionTrustLine(ctx.GetStub(), cc.Tipologia.Code, receptor, emisor)
-			if err == shim.ErrStateNotFound {
-				err = postulacion.ErrTransferTrustline
-				fmt.Printf(err.Error())
-				return
-			}
-			if err != nil {
-				fmt.Printf(err.Error())
-				return
-			}
-			if !tl.Trust {
-				err = postulacion.ErrTransferTrustline
-				fmt.Printf(err.Error())
-				return
-			}
-		}
-		// Check issuer
-		if utxo.Emisor != emisor {
-			err = postulacion.ErrOnlySameIssuerTransfer
-			fmt.Printf(err.Error())
-			return
-		}
-		// Check owner
-		if utxo.Receptor != ctx.GetMSPID() {
-			err = postulacion.ErrOnlyOwnerTransfer
-			fmt.Printf(err.Error())
-			return
-		}
-		// Check redemption status
-		if utxo.RedemptionPending {
-			err = postulacion.ErrPendingRedemptionTransfer
-			fmt.Printf(err.Error())
-			return
-		}
-		// Add value to input amount
-		//totalInputAmount += utxo.Value
-
-		err = shim.DeletePostulacion(ctx.GetStub(), cc.Tipologia.Code, utxoID)
-		if err != nil {
-			fmt.Printf(err.Error())
-			return
-		}
-		spentUTXO[utxoID] = true
-	}
-
-
-	
-	// Create new outputs
-	var transferUTXO, changeUTXO postulacion.Postulacion
-	/*
-	comendtado
-	if totalInputAmount < amount {
-		err = postulacion.ErrInsufficientTransferFunds
-		fmt.Printf(err.Error())
-		return
-	}
-*/
-	
-	transferUTXO = postulacion.Postulacion{
-		ID:     ctx.GetStub().GetTxID() + ":" + "0",
-		Emisor: emisor,
-		Receptor:  receptor,
-		//Value:  amount,
-	}
-	err = shim.PutPostulacion(ctx.GetStub(), cc.Tipologia.Code, transferUTXO)
+	//obtener postulaciona traves del POSID
+	ObjetoPostulacion, err = shim.GetPostulacionByID(ctx.GetStub(), cc.Tipologia.Code, posIDSet)
 	if err != nil {
 		fmt.Printf(err.Error())
 		return
 	}
 
-	//changeAmount := totalInputAmount - amount
-	//if changeAmount > 0 {
-		changeUTXO = postulacion.Postulacion{
-			ID:     ctx.GetStub().GetTxID() + ":" + "1",
-			Emisor: emisor,
-			Receptor:  ctx.GetMSPID(),
-			Puntaje:  puntaje-1,
-		}
-		err = shim.PutPostulacion(ctx.GetStub(), cc.Tipologia.Code, changeUTXO)
-		if err != nil {
-			fmt.Printf(err.Error())
-			return
-		}
-	//}
+	// pasar emisor
+	emisor = ObjetoPostulacion.Emisor
 
+	// Validar que se permita la transaferencia entre organizaciones
+	tl, err := shim.GetPostulacionTrustLine(ctx.GetStub(), cc.Tipologia.Code, receptor, emisor)
+	if err != nil {
+		return
+	}
+	if !tl.Trust {
+		err = postulacion.ErrTransferirTrustline
+		return
+	}
+
+
+	// Validar que emisor sea el dueño de la postulacion
+	if ObjetoPostulacion.Emisor != emisor {
+		err = postulacion.SoloTransferenciaMismoEmisor
+		fmt.Printf(err.Error())
+		return
+	}
+
+	if ObjetoPostulacion.EstadoExpediente == "Creacion"{
+		
+
+		hasOUPermission, errr := cid.HasOUValue(ctx.GetStub(),"egr")
+
+		if !hasOUPermission {
+			errr  = postulacion.ErrEnvioPostulacionCreacion
+			fmt.Printf(errr.Error())
+			return 
+		}
+
+		// Crear estructura de postulacion para realizar envio desde egr a serviu
+		transferPostulacion = postulacion.Postulacion{
+			ID				  :ctx.GetStub().GetTxID() + ":" + "1",
+			Emisor            :emisor,
+			Receptor          :receptor,
+			EstadoExpediente  :"Enviado",
+			EstadoPostulante  :"Inscrito",
+			RutPostulante     :ObjetoPostulacion.RutPostulante,
+			Puntaje			  :ObjetoPostulacion.Puntaje,
+			MontoSubsidioUF   :ObjetoPostulacion.MontoSubsidioUF,
+		}
+		
+	}else if ObjetoPostulacion.EstadoExpediente == "Enviado" { 
+		
+		//SERVIU solo puede enviar expedientes en estado Enviado
+		hasOUPermission, errr := cid.HasOUValue(ctx.GetStub(),"serviu")
+		
+		if !hasOUPermission {
+			errr  = postulacion.ErrEnvioPostulacionEnviado
+			fmt.Printf(errr.Error())
+			return 
+		}
+
+		// Crear estructura de postulacion para realizar envio desde egr a serviu
+		transferPostulacion = postulacion.Postulacion{
+			ID				  :ctx.GetStub().GetTxID() + ":" + "1",
+			Emisor            :emisor,
+			Receptor          :receptor,
+			EstadoExpediente  :"Aprobado",
+			EstadoPostulante  :"Inscrito",
+			RutPostulante     :ObjetoPostulacion.RutPostulante,
+			Puntaje			  :ObjetoPostulacion.Puntaje,
+			MontoSubsidioUF   :ObjetoPostulacion.MontoSubsidioUF,
+		}
+
+	}
+
+	err = shim.PutPostulacion(ctx.GetStub(), cc.Tipologia.Code, transferPostulacion)
+	if err != nil {
+		fmt.Printf(err.Error())
+		return
+	}
+	
 	// Set the event payload
 	payload = postulacion.TransferedPayload{
-		TransferedBy: ctx.GetMSPID(),
-		//SpentUTXOIDSet:   utxoIDSet,
-		ChangeUTXOID:     changeUTXO.ID,
-		TransferedUTXOID: transferUTXO.ID,
-		Receptor:         receptor,
-		TipologiaCode:     cc.Tipologia.Code,
+		TransferedBy   :ctx.GetMSPID(),
+		TransferedPOSID:transferPostulacion.ID,
+		Receptor       :receptor,
+		//Receptor:ObjetoPostulacion.TipologiaCode,
+		TipologiaCode  :cc.Tipologia.Code,
 	}
-	fmt.Printf("End of Transfer: " + payload.TransferedUTXOID)
-	//ctx.SetEventPayload(payload)
+	fmt.Printf("End of Transfer: " + payload.TransferedPOSID)
+
 	return
-}
-
-// RequestRedemption requests to receive the off-chain currency that is guarded by the issuer of the specified UTXO
-func (cc *MinvuControlContract) RequestRedemption(ctx CustomTransactionContextInterface, utxoID string) (payload postulacion.RedemptionRequestedPayload, err error) {
-	utxo, err := shim.GetPostulacionByID(ctx.GetStub(), cc.Tipologia.Code, utxoID)
-	if err != nil {
-		return
-	}
-	if utxo.RedemptionPending {
-		err = postulacion.ErrRedemptionRequestPending
-		return
-	}
-	if utxo.Emisor != ctx.GetMSPID() {
-		err = postulacion.ErrOnlyOwnerRequestRedemption
-		return
-	}
-	utxo.RedemptionPending = true
-	err = shim.PutPostulacion(ctx.GetStub(), cc.Tipologia.Code, utxo)
-	if err != nil {
-		return
-	}
-
-	payload = postulacion.RedemptionRequestedPayload{
-		Requestor:    ctx.GetMSPID(),
-		Redeemer:     utxo.Emisor,
-		UTXOID:       utxo.ID,
-		TipologiaCode: cc.Tipologia.Code,
-	}
-	//ctx.SetEventPayload(payload)
-	return
-}
-
-// ConfirmRedemption confirms the off-chain reception of the currency represented by the utxo and destroys the utxo on-chain
-func (cc *MinvuControlContract) ConfirmRedemption(ctx CustomTransactionContextInterface, utxoID string) (payload postulacion.RedemptionConfirmedPayload, err error) {
-	utxo, err := shim.GetPostulacionByID(ctx.GetStub(), cc.Tipologia.Code, utxoID)
-	if err != nil {
-		return
-	}
-	if !utxo.RedemptionPending {
-		err = postulacion.ErrNoRedemptionRequestToConfirm
-		return
-	}
-	if utxo.Emisor != ctx.GetMSPID() {
-		err = postulacion.ErrOnlyOwnerConfirmRedemption
-		return
-	}
-	err = shim.DeletePostulacion(ctx.GetStub(), cc.Tipologia.Code, utxoID)
-	if err != nil {
-		return
-	}
-
-	payload = postulacion.RedemptionConfirmedPayload{
-		ConfirmedBy:  ctx.GetMSPID(),
-		Redeemer:     utxo.Emisor,
-		UTXOID:       utxo.ID,
-		TipologiaCode: cc.Tipologia.Code,
-	}
-	//ctx.SetEventPayload(payload)
-	return
+	
 }
 
 // SetTrustline can be used to enable or disable receptions of this currency from a specific issuer
