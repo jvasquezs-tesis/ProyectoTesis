@@ -18,7 +18,7 @@ const logger = require("@hyperledger/caliper-core").CaliperUtils.getLogger(
     "postulacion-insert"
 );
 
-module.exports.info = "Mint callback";
+module.exports.info = "Metodo Insert";
 
 const contractID = "minvucontrol";
 const version = "v0.1";
@@ -64,7 +64,7 @@ module.exports.init = async(blockchain, context, args) => {
             `Client ${clientIdx}: Setting trustline for ${receiver} to receive from ${minter}`
         );
         const trustlineArgs = {
-            chaincodeFunction: tipologiaCode + "CSRTipologiaContract:SetTrustline",
+            chaincodeFunction: tipologiaCode + "CCHTipologiaContract:SetTrustline",
             invokerIdentity: receiverIdentity,
             chaincodeArguments: [minter, true, "-1"],
             targetPeers: targetPeers,
@@ -91,7 +91,7 @@ module.exports.init = async(blockchain, context, args) => {
 
 module.exports.run = async() => {
     let txArgs = {
-        chaincodeFunction: tipologiaCode + "CSRTipologiaContract:Insert",
+        chaincodeFunction: tipologiaCode + "CCHTipologiaContract:Insert",
         chaincodeArguments: [amount, receiver],
         transientMap: privateData,
         invokerIdentity: insertIdentity,

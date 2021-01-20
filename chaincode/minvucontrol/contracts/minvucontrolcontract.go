@@ -78,8 +78,9 @@ func (cc *MinvuControlContract) Insert(ctx CustomTransactionContextInterface, ru
 	// Llenar estructura postulacion a insertar
 	ObjetoPostulacion := postulacion.Postulacion{
 		ID				:ctx.GetStub().GetTxID() + ":" + "0",
-		Emisor			:ctx.GetMSPID(),
-		Receptor        :"", // No existe receptor en proceso de inserción
+		//Emisor			:ctx.GetMSPID(),
+		Owner			:ctx.GetMSPID(),
+		//Receptor        :"", // No existe receptor en proceso de inserción
 		RutPostulante   :rutpostulante,
 		Puntaje			:puntaje,
 		MontoSubsidioUF :montosubsidiouf,
@@ -98,7 +99,7 @@ func (cc *MinvuControlContract) Insert(ctx CustomTransactionContextInterface, ru
 		Insert			:ctx.GetMSPID(),
 		POSID			:ObjetoPostulacion.ID,
 		TipologiaCode	:cc.Tipologia.Code,
-		Receptor        :"",
+		//Receptor        :"",
 		RutPostulante   :rutpostulante,
 		Puntaje			:puntaje,
 		MontoSubsidioUF :montosubsidiouf,
@@ -134,7 +135,8 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 	}
 
 	// pasar emisor
-	emisor = ObjetoPostulacion.Emisor
+	//emisor = ObjetoPostulacion.Emisor
+	emisor = ObjetoPostulacion.Owner
 
 	// Validar que se permita la transaferencia entre organizaciones
 	tl, err := shim.GetPostulacionTrustLine(ctx.GetStub(), cc.Tipologia.Code, receptor, emisor)
@@ -148,7 +150,7 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 
 
 	// Validar que emisor sea el dueño de la postulacion
-	if ObjetoPostulacion.Emisor != emisor {
+	if ObjetoPostulacion.Owner != emisor {
 		err = postulacion.SoloTransferenciaMismoEmisor
 		fmt.Printf(err.Error())
 		return
@@ -168,8 +170,9 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 		// Crear estructura de postulacion para realizar envio desde egr a serviu
 		transferPostulacion = postulacion.Postulacion{
 			ID				  :ctx.GetStub().GetTxID() + ":" + "1",
-			Emisor            :emisor,
-			Receptor          :receptor,
+			//Emisor            :emisor,
+			//Receptor          :receptor,
+			Owner		      :receptor,
 			EstadoExpediente  :"Enviado",
 			EstadoPostulante  :"Inscrito",
 			RutPostulante     :ObjetoPostulacion.RutPostulante,
@@ -191,8 +194,9 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 		// Crear estructura de postulacion para realizar envio desde egr a serviu
 		transferPostulacion = postulacion.Postulacion{
 			ID				  :ctx.GetStub().GetTxID() + ":" + "1",
-			Emisor            :emisor,
-			Receptor          :receptor,
+			//Emisor            :emisor,
+			//Receptor          :receptor,
+			Owner		      :receptor,
 			EstadoExpediente  :"Aprobado",
 			EstadoPostulante  :"Inscrito",
 			RutPostulante     :ObjetoPostulacion.RutPostulante,
@@ -212,7 +216,8 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 	payload = postulacion.TransferedPayload{
 		TransferedBy   :ctx.GetMSPID(),
 		TransferedPOSID:transferPostulacion.ID,
-		Receptor       :receptor,
+		//Receptor       :receptor,
+		Owner       :receptor,
 		//Receptor:ObjetoPostulacion.TipologiaCode,
 		TipologiaCode  :cc.Tipologia.Code,
 	}
@@ -222,21 +227,99 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 	
 }
 
-// SetTrustline can be used to enable or disable receptions of this currency from a specific issuer
-func (cc *MinvuControlContract) SetTrustline(ctx CustomTransactionContextInterface, emisor string, trust bool) (payload postulacion.TrustlineSetPayload, err error) {
-	// createCompositeKey with currency code, sender,issuer and value of bool trust
-	// Validate parameters
-	if emisor == "" {
-		err = postulacion.ErrTrustlineIssuerRequiered
+func (cc *MinvuControlContract) Selection(ctx CustomTransactionContextInterface, posIDSet string, estado string) (payload postulacion.SelectedPayload, err error) {
+	
+	//variables 
+	var ObjetoPostulacion postulacion.Postulacion
+	var transferPostulacion postulacion.Postulacion
+	var estadoPostulante string = "Beneficiado"
+	// Validar que se ingrese por lo menos una postulacion a seleccionar
+	if posIDSet == "" {
+		err = postulacion.ErrTransferVacioPOSIDSet
+		fmt.Printf(err.Error())
+		return
+	}
+	// Se debe agregar estado requerido 
+	if estado == ""{
+		err = postulacion.ErrEstadoRequerido 
+		return
+	}else if estado != "Seleccionado" || estado != "Rechazado" {
+		err = postulacion.ErrEstadoRequeridoNoValido
+	}
+
+	//obtener postulaciona traves del POSID
+	ObjetoPostulacion, err = shim.GetPostulacionByID(ctx.GetStub(), cc.Tipologia.Code, posIDSet)
+	if err != nil {
+		fmt.Printf(err.Error())
 		return
 	}
 
-	// Set trustline
+	// validar estado actual del expediente
+	if ObjetoPostulacion.EstadoExpediente == "Aprobado"{
+		
+		// solo dph puede beneficiar postulantes
+		hasOUPermission, errr := cid.HasOUValue(ctx.GetStub(),"dph")
+
+		if !hasOUPermission {
+			errr = postulacion.ErrEnvioPostulacionAprobado
+			fmt.Printf(errr.Error())
+			return 
+		}
+
+		if estado != "Seleccionado"{
+			estadoPostulante = "No Seleccionado"
+		}
+
+		// Crear estructura de postulacion para realizar envio desde egr a serviu
+		transferPostulacion = postulacion.Postulacion{
+			ID				  :ctx.GetStub().GetTxID() + ":" + "0",
+			Owner		      :ObjetoPostulacion.Owner,
+			EstadoExpediente  :estado,
+			EstadoPostulante  :estadoPostulante,
+			RutPostulante     :ObjetoPostulacion.RutPostulante,
+			Puntaje			  :ObjetoPostulacion.Puntaje,
+			MontoSubsidioUF   :ObjetoPostulacion.MontoSubsidioUF,
+		}
+		
+	}else { 
+		// solo postulaciones aprobadas pueden ser evaluadas en esta etapa
+		err  = postulacion.ErrSoloAprobados
+		fmt.Printf(err.Error())
+		return 
+	}
+
+	err = shim.PutPostulacion(ctx.GetStub(), cc.Tipologia.Code, transferPostulacion)
+	if err != nil {
+		fmt.Printf(err.Error())
+		return
+	}
+	
+	// Set the event payload
+	payload = postulacion.SelectedPayload{
+		SelectedBy   :ctx.GetMSPID(),
+		SelectedPOSID:transferPostulacion.ID,
+		Owner        :ObjetoPostulacion.Owner,
+		TipologiaCode:cc.Tipologia.Code,
+	}
+	fmt.Printf("End of Transfer: " + payload.SelectedPOSID)
+
+	return
+	
+}
+
+// SetTrustline can be used to enable or disable receptions of this currency from a specific issuer
+func (cc *MinvuControlContract) SetTrustline(ctx CustomTransactionContextInterface, emisor string, trust bool) (payload postulacion.TrustlineSetPayload, err error) {
+	// Validar emisor 
+	if emisor == "" {
+		err = postulacion.ErrTrustlineEmisorRequerido
+		return
+	}
+
+	// Insertar linea de confianza
 	err = shim.PutPostulacionTrustLine(ctx.GetStub(), cc.Tipologia.Code, postulacion.PostulacionTrustLine{
 		Receptor: ctx.GetMSPID(),
 		Emisor:   emisor,
 		Trust:    trust,
-		//MaxLimit: limit,
 	})
 	if err != nil {
 		return
@@ -248,18 +331,18 @@ func (cc *MinvuControlContract) SetTrustline(ctx CustomTransactionContextInterfa
 		Trust:        trust,
 		TipologiaCode: cc.Tipologia.Code,
 	}
-	//ctx.SetEventPayload(payload)
 	return
 }
 
-// QueryCouchDB can be used to execute rich queries against the CouchDB
+//QueryCouchDB se puede utilizar para ejecutar consultas contra CouchDB
 func (cc *MinvuControlContract) QueryCouchDB(ctx CustomTransactionContextInterface, query string) (queryResultInJSONString string, err error) {
 	queryResultInJSONString, err = shim.QueryCouchDB(ctx.GetStub(), query)
 	return
 }
 
-// GetHistoryOfUTXO can be used to search through the history of a UTXO
-func (cc *MinvuControlContract) GetHistoryOfUTXO(ctx CustomTransactionContextInterface, id string) (historyInJSONString string, err error) {
+
+//GetHistoryOfPOS se puede utilizar para buscar en el historial de una postulacion
+func (cc *MinvuControlContract) GetHistoryOfPOS(ctx CustomTransactionContextInterface, id string) (historyInJSONString string, err error) {
 	historyInJSONString, err = shim.GetHistoryForPostulacionID(ctx.GetStub(), cc.Tipologia.Code, id)
 	return
 }
