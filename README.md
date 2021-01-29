@@ -1,82 +1,85 @@
-TRAZABILIDAD DE POSTULACIÓN.
+1. REQUISITOS PREVIOS 
 
-REQUISITOS PREVIOS SOBRE SISTEMA OPERATIVO UBUNTU VERSIÓN 20.04.1 LTS
-
--Instalar Visual Studio Code Versión 1.50.1
-
+-Instalar Visual Studio Code Versión 1.52.1
 ```shell
   sudo snap install --classic code 
 ```
--Instalar curl
 
+-Instalar curl Versión 7.68.0
 ```shell
   sudo apt install curl
 ```
 
--Instalar docker
+-Instalar docker Versión 19.03.8
 ```shell
   sudo apt install docker 
 ```
-Instalar node v10.19.0
+
+-Instalar node Versión 12.14.1
 ```shell
   sudo apt install nodejs
 ```
-Instalar nodee-gyp v6.1.0
+
+-Instalar nodee-gyp v6.1.0
 ```shell
   sudo apt install node-gyp
 ```
 
--Instalar docker-compose
-```shell
-  sudo apt install docker 
-```
- 
--Instalar docker-compose
+-Instalar docker-compose 1.25.0
 ```shell
    sudo apt install docker-compose
 ```
--Configurar servicio docker
 
+-Configurar servicio docker
+```shell
   sudo systemctl enable docker
+```
 
 -Configurar usuario docker
-
+```shell
   sudo usermod -aG docker ${USER}
+```
 
 -Realizar la instalación de Golang de debe ir al sitio oficial https://golang.org/dl/ y descargar la versión para Linux. -Descomprimir go tar.gz
-
+```shell
   sudo tar -xvf go1.15.3.linux-amd64.tar.gz
+```
 
 -Mover GO a carpeta de sistema
-
+```shell
   sudo mv go /usr/local
+```
 
 -Agregar configuraciones en profile
-
+```shell
   sudo nano ~/.profile
+```
 
 -Lineas a agregar en archivo
-
 ```shell
   sudo systemctl enable docker
 ```
+
 -Configurar usuario docker
 ```shell
   sudo usermod -aG docker ${USER}
 ```
+
 -Realizar la instalación de Golang de debe ir al sitio oficial https://golang.org/dl/ y descargar la versión para Linux.
 -Descomprimir go tar.gz
 ```shell
-  sudo tar -xvf go1.15.3.linux-amd64.tar.gz
+  sudo tar -xvf go1.15.6.linux-amd64.tar.gz
 ```
 -Mover GO a carpeta de sistema
 ```shell
   sudo mv go /usr/local
 ```
+
 -Agregar configuraciones en profile
 ```shell
   sudo nano ~/.profile
 ```
+
  -Lineas a agregar en archivo
 ```shell
   export GOROOT=/usr/local/go
@@ -85,28 +88,22 @@ Instalar nodee-gyp v6.1.0
 ```
 
 -Configurar archivos git
-
+```shell
   git config --global core.autocrlf false
   git config --global core.longpaths true
-
+```
 -Crear carpeta
-
 ```shell
   git config --global core.autocrlf false
   git config --global core.longpaths true
 ```  
+
 -Crear carpeta
 ```shell
   mkdir ProyectoTesis
 ```
+
 -Clonar muestras hyperledger en la carpeta ProyectoTesis
-
-  curl -sSL https://bit.ly/2ysbOFE | bash -s
-
--Configurar variable de entorno.
-
-  echo 'export PATH=$PATH:$HOME/ProyectoTesis/fabric-samples/bin'>> ~/.profile
-  source ~/.profile
 ```shell
   curl -sSL https://bit.ly/2ysbOFE | bash -s
 ```
@@ -116,6 +113,12 @@ Instalar nodee-gyp v6.1.0
   echo 'export PATH=$PATH:$HOME/ProyectoTesis/fabric-samples/bin'>> ~/.profile
   source ~/.profile
 ```
+
+
+
+
+
+
 
 ___________________________________________________________________________________________________________________________________________________
 
