@@ -1,6 +1,6 @@
 test:
   name: "Evaluación de Contratos de Postulación"
-  description: "Este escenario de referencia utilizará transacciones de contratos de postulación, desde la acuñación hasta la transferencia y el canje"
+  description: "Este escenario de referencia utilizará transacciones de contratos de postulación"
   workers:
 
 

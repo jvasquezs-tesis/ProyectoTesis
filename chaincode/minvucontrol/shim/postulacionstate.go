@@ -40,7 +40,7 @@ func PutPostulacionTrustLine(stub shim.ChaincodeStubInterface, tipologiaCode str
 	return
 }
 
-// DeleteCurrencyUTXO deletes a UTXO from the World State
+// DeletePostulacion deletes a UTXO from the World State
 func DeletePostulacion(stub shim.ChaincodeStubInterface, tipologiaCode string, id string) (err error) {
 	key, err := stub.CreateCompositeKey(tipologiaCode, []string{id})
 	if err != nil {

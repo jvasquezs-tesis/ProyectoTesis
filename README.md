@@ -122,7 +122,7 @@
 
 ___________________________________________________________________________________________________________________________________________________
 
-CONFIGURACIÓN Y EJECUCIÒN DE LA RED HYPERLEDGER FABRIC
+CONFIGURACIÓN Y EJECUCIÒN DE LA RED HYPERLEDGER FABRIC CON FUNCIONALIDAD CRYPTOGEN
 
 MATERIAL CRIPTOGRAFICO.
 
