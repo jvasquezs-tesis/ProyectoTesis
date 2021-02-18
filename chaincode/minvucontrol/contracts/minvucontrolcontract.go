@@ -159,15 +159,15 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 	if ObjetoPostulacion.EstadoExpediente == "Creacion"{
 		
 
-		hasOUPermission, errr := cid.HasOUValue(ctx.GetStub(),"egr")
+		hasOUPermission, err := cid.HasOUValue(ctx.GetStub(),"egr")
 
-		if errr != nil {
+		if err != nil {
 			return
 		}
 
 		if !hasOUPermission {
-			errr  = postulacion.ErrEnvioPostulacionCreacion
-			fmt.Printf(errr.Error())
+			err  = postulacion.ErrEnvioPostulacionCreacion
+			fmt.Printf(err.Error())
 			return 
 		}
 
@@ -187,14 +187,14 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 	}else if ObjetoPostulacion.EstadoExpediente == "Enviado" { 
 		
 		//SERVIU solo puede enviar expedientes en estado Enviado
-		hasOUPermission, errr := cid.HasOUValue(ctx.GetStub(),"serviu")
-		if errr != nil {
+		hasOUPermission, err := cid.HasOUValue(ctx.GetStub(),"serviu")
+		if err != nil {
 			return
 		}
 
 		if !hasOUPermission {
-			errr  = postulacion.ErrEnvioPostulacionEnviado
-			fmt.Printf(errr.Error())
+			err  = postulacion.ErrEnvioPostulacionEnviado
+			fmt.Printf(err.Error())
 			return 
 		}
 
