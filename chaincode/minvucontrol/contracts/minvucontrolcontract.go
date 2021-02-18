@@ -70,7 +70,7 @@ func (cc *MinvuControlContract) Insert(ctx CustomTransactionContextInterface, ru
 		return
 	}
 	// puntaje del postulante debe ser mayor a 0 y menor o igual a 100
-	if puntaje < 0 || puntaje >= 100{
+	if puntaje < 0 || puntaje > 100{
 		err = postulacion.ErrValidarPuntaje
 		return 
 	}
@@ -161,6 +161,10 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 
 		hasOUPermission, errr := cid.HasOUValue(ctx.GetStub(),"egr")
 
+		if errr != nil {
+			return
+		}
+
 		if !hasOUPermission {
 			errr  = postulacion.ErrEnvioPostulacionCreacion
 			fmt.Printf(errr.Error())
@@ -184,7 +188,10 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 		
 		//SERVIU solo puede enviar expedientes en estado Enviado
 		hasOUPermission, errr := cid.HasOUValue(ctx.GetStub(),"serviu")
-		
+		if errr != nil {
+			return
+		}
+
 		if !hasOUPermission {
 			errr  = postulacion.ErrEnvioPostulacionEnviado
 			fmt.Printf(errr.Error())
@@ -260,6 +267,10 @@ func (cc *MinvuControlContract) Selection(ctx CustomTransactionContextInterface,
 		// solo dph puede beneficiar postulantes
 		hasOUPermission, errr := cid.HasOUValue(ctx.GetStub(),"dph")
 
+		if errr != nil {
+			return
+		}
+		
 		if !hasOUPermission {
 			errr = postulacion.ErrEnvioPostulacionAprobado
 			fmt.Printf(errr.Error())

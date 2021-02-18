@@ -28,13 +28,11 @@ let bc,
     ctx,
     tipologiaCode,
     insertIdentity,
-    receiver,
-    clientIdx,
-    privateData,
-    amount,
-    targetPeers,
-    receiverIdentity,
-    utxoIDs = [];
+    RutPostulante,
+    Puntaje,
+    MontoSubsidioUF,
+    targetPeers;
+
 
 /**
  * Initializes the workload module before the start of the round.
@@ -45,65 +43,35 @@ let bc,
 module.exports.init = async(blockchain, context, args) => {
     bc = blockchain;
     ctx = context;
-    tipologiaCode = args.tipologiaCode;
+    tipologiaCode = args.TipologiaCode;
     insertIdentity = args.client;
-    receiver = args.receiver;
-    receiverIdentity = args.receiverClient;
-    amount = args.amount;
-    clientIdx = context.clientIdx.toString();
+    RutPostulante = args.rutpostulante;
+    Puntaje = args.puntaje;
+    MontoSubsidioUF = args.montosubsidiouf;
     targetPeers = Array.from(
-        ctx.networkInfo.getPeersOfOrganization(args.minterOrg)
-    ).concat(
-        Array.from(ctx.networkInfo.getPeersOfOrganization(args.receiverOrg))
+        ctx.networkInfo.getPeersOfOrganization(args.insertedOrg)
+    )
+    .concat(
+        Array.from(ctx.networkInfo.getPeersOfOrganization(args.receptorOrg))
     );
-    let minter = args.minter;
-
-    // Set the trustline between minter and receiver first
-    try {
-        console.log(
-            `Client ${clientIdx}: Setting trustline for ${receiver} to receive from ${minter}`
-        );
-        const trustlineArgs = {
-            chaincodeFunction: tipologiaCode + "CCHTipologiaContract:SetTrustline",
-            invokerIdentity: receiverIdentity,
-            chaincodeArguments: [minter, true, "-1"],
-            targetPeers: targetPeers,
-        };
-        await bc.bcObj.invokeSmartContract(ctx, contractID, version, trustlineArgs);
-    } catch (error) {
-        console.log(
-            `Client ${clientIdx}: Smart Contract threw with error: ${error}`
-        );
-    }
-
-    // Create the private data required for minting
-    privateData = {
-        mintPrivateData: Buffer.from(
-            JSON.stringify({
-                depositReference: args.depositReference,
-                bank: args.depositBank,
-            })
-        ),
-    };
 
     logger.debug("Initialized workload module");
 };
 
 module.exports.run = async() => {
     let txArgs = {
-        chaincodeFunction: tipologiaCode + "CCHTipologiaContract:Insert",
-        chaincodeArguments: [amount, receiver],
-        transientMap: privateData,
+        chaincodeFunction: tipologiaCode + "TipologiaContract:Insert",
+        chaincodeArguments: [RutPostulante, Puntaje, MontoSubsidioUF],
         invokerIdentity: insertIdentity,
         targetPeers: targetPeers,
     };
 
     return bc.bcObj.invokeSmartContract(
         ctx,
-        "minvucontrol",
-        "v1.0",
+        contractID,
+        version,
         txArgs,
-        100
+        10
     );
 };
 
