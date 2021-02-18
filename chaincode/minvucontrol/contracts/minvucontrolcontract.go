@@ -252,6 +252,7 @@ func (cc *MinvuControlContract) Selection(ctx CustomTransactionContextInterface,
 		return
 	}else if estado != "Seleccionado" || estado != "Rechazado" {
 		err = postulacion.ErrEstadoRequeridoNoValido
+		return
 	}
 
 	//obtener postulaciona traves del POSID
@@ -265,15 +266,15 @@ func (cc *MinvuControlContract) Selection(ctx CustomTransactionContextInterface,
 	if ObjetoPostulacion.EstadoExpediente == "Aprobado"{
 		
 		// solo dph puede beneficiar postulantes
-		hasOUPermission, errr := cid.HasOUValue(ctx.GetStub(),"dph")
+		hasOUPermission, err := cid.HasOUValue(ctx.GetStub(),"dph")
 
-		if errr != nil {
+		if err != nil {
 			return
 		}
-		
+
 		if !hasOUPermission {
-			errr = postulacion.ErrEnvioPostulacionAprobado
-			fmt.Printf(errr.Error())
+			err = postulacion.ErrEnvioPostulacionAprobado
+			fmt.Printf(err.Error())
 			return 
 		}
 
