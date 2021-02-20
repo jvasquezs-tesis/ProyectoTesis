@@ -6,6 +6,7 @@ docker rm $(docker ps -aq --filter 'name=orderer')
 docker rm $(docker ps -aq --filter 'name=ca')
 docker rm $(docker ps -aq --filter 'name=minvucontrol')
 docker rmi $(docker images -q --filter 'reference=*minvucontrol*')
+docker rmi $(docker images -a -q )
 cd scripts && ./cleancerts.sh
 rm -r ../channel-artifacts/*
 rm -r ../fabric-ca/org1.minvu.cl/peers/peer0.org1.minvu.cl/production
