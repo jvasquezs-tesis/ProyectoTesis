@@ -71,7 +71,7 @@ module.exports.run = async() => {
         contractID,
         version,
         txArgs,
-        10
+        200 // timeout en caso de falla
     );
 };
 

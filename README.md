@@ -1,3 +1,11 @@
+****************************************************************************************
+****************************************************************************************
+
+Agradecimiento al curso [Hyperledger Latinoamérica](https://wiki.hyperledger.org/display/CP/Hyperledger+Latinoamerica "Hyperledger Latinoamérica") y [Business Blockchain](https://www.blockchainempresarial.com/ "Business Blockchain").
+
+****************************************************************************************
+****************************************************************************************
+
 1. REQUISITOS PREVIOS 
 
 -Instalar Visual Studio Code Versión 1.52.1
@@ -114,15 +122,49 @@
   source ~/.profile
 ```
 
+-Visualizar Certificado CA
+```shell
+openssl x509 -in ca-cert.pem -text -noout
+```
+
+
+****************************************************************************************
+****************************************************************************************
+
+IMPLEMENTACIÓN DE LA RED AUTOMATIZADA
+
+Solo ejecute archivo up.sh 
+
+```shell
+./up.sh
+```
+
+Para eliminar material criptografico 
+
+```shell
+./down.sh
+```
+
+****************************************************************************************
+****************************************************************************************
 
 
 
+****************************************************************************************
+****************************************************************************************
 
+INSTALACIÓN MANUAL DE LA RED HYPERLEDGER FABRIC
+ 
+****************************************************************************************
+****************************************************************************************
 
+****************************************************************************************
+****************************************************************************************
 
-___________________________________________________________________________________________________________________________________________________
-
-CONFIGURACIÓN Y EJECUCIÒN DE LA RED HYPERLEDGER FABRIC CON FUNCIONALIDAD CRYPTOGEN
+CONFIGURACIÓN Y EJECUCIÓN DE LA RED HYPERLEDGER FABRIC CON FUNCIONALIDAD CRYPTOGEN
+ 
+****************************************************************************************
+****************************************************************************************
 
 MATERIAL CRIPTOGRAFICO.
 
@@ -312,37 +354,40 @@ peer lifecycle chaincode commit -o orderer.minvu.cl:7050 --tls --cafile $ORDERER
 peer lifecycle chaincode commit -o orderer.minvu.cl:7050 --tls --cafile $ORDERER_CA --peerAddresses peer0.org1.minvu.cl:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.minvu.cl/peers/peer0.org1.minvu.cl/tls/ca.crt --peerAddresses peer0.org2.minvu.cl:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.minvu.cl/peers/peer0.org2.minvu.cl/tls/ca.crt --peerAddresses peer0.org3.minvu.cl:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.minvu.cl/peers/peer0.org3.minvu.cl/tls/ca.crt --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version $CHAINCODE_VERSION --sequence 1 --signature-policy "OR ('Org1MSP.peer','Org2MSP.peer','Org3MSP.peer')"
 ```
 
--Insertar mediante funciòn set del chaincode
+-Insertar mediante función set del chaincode
 -Ingresar a la consola de comandos en cli 
 
 
--Insertar desde organizacion 1.
+-Insertar desde organización 1.
 ```shell
 peer chaincode invoke -o orderer.minvu.cl:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","3","176941979","3180","55","1300","Ingresado","EGR"]}'
 ```
-Verificar transaccion mediante función query del chaincode
+Verificar transacción mediante función query del chaincode
 
 ```shell
   peer chaincode query -C $CHANNEL_NAME -n $CHAINCODE_NAME -c ‘{“Args”:[“Query”,”3”]}’
 ```
--Insertar desde organizacion 2.
+-Insertar desde organización 2.
 
-CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.minvu.cl/users/Admin@org2.minvu.cl/msp CORE_PEER_ADDRESS=peer0.org2.minvu.cl:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.minvu.cl/peers/peer0.org2.minvu.cl/tls/ca.crt peer chaincode invoke -o orderer.minvu.cl:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","4","176941979","3180","55","1300","Ingresado","EGR"]}'
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.minvu.cl/users/Admin@org2.minvu.cl/msp CORE_PEER_ADDRESS=peer0.org2.minvu.cl:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.minvu.cl/peers/peer0.org2.minvu.cl/tls/ca.crt peer chaincode invoke -o orderer.minvu.cl:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","4","176767671","3180","55","1300","Ingresado","EGR"]}'
 
--Insertar desde organizacion 3.
+-Insertar desde organización 3.
 
 ```shell
-CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.minvu.cl/users/Admin@org2.minvu.cl/msp CORE_PEER_ADDRESS=peer0.org2.minvu.cl:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.minvu.cl/peers/peer0.org2.minvu.cl/tls/ca.crt peer chaincode invoke -o orderer.minvu.cl:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","4","176941979","3180","55","1300","Ingresado","EGR"]}'
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.minvu.cl/users/Admin@org2.minvu.cl/msp CORE_PEER_ADDRESS=peer0.org2.minvu.cl:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.minvu.cl/peers/peer0.org2.minvu.cl/tls/ca.crt peer chaincode invoke -o orderer.minvu.cl:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","4","176767671","3180","55","1300","Ingresado","EGR"]}'
 ```
 
--Insertar desde organizacion 3.
+-Insertar desde organización 3.
 ```shell
-CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.minvu.cl/users/Admin@org3.minvu.cl/msp CORE_PEER_ADDRESS=peer0.org3.minvu.cl:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.minvu.cl/peers/peer0.org3.minvu.cl/tls/ca.crt peer chaincode invoke -o orderer.minvu.cl:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","5","176941979","3180","55","1300","Ingresado","serviu"]}'
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.minvu.cl/users/Admin@org3.minvu.cl/msp CORE_PEER_ADDRESS=peer0.org3.minvu.cl:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.minvu.cl/peers/peer0.org3.minvu.cl/tls/ca.crt peer chaincode invoke -o orderer.minvu.cl:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","5","176767671","3180","55","1300","Ingresado","serviu"]}'
 ```
 
-----------------
-COFIGURACION DE CERTIFICADOS EN LA RED 
----------------
+****************************************************************************************
+****************************************************************************************
+COFIGURACIÓN ARQUITECTURA CON ENTIDAD CERTIFICADORA
+****************************************************************************************
+****************************************************************************************
+
 
 Crear root CA. o CA Raiz
 
@@ -363,6 +408,66 @@ cd scripts/ && ./intca.sh
 ´´´
 
 ´´´shell
+export CSR_NAMES_ORG1="C=CL,ST=Santiago,L=Santiago,O=Org1,OU=Hyperledger Fabric"
+export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin
+
+fabric-ca-client register --id.name admin2@org1.minvu.cl --id.secret admin2pw --id.type admin -u http://admin:adminpw@localhost:7056
+
+export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin2@org1.minvu.cl
+
+fabric-ca-client enroll -u http://admin2@org1.minvu.cl:admin2pw@localhost:7056 --csr.names "$CSR_NAMES_ORG1"
+
+export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/tls-int/clients/admin
+
+fabric-ca-client register --id.name admin2@org1.minvu.cl --id.secret admin2pw --id.type admin -u http://admin:adminpw@localhost:7057
+
+export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/tls-int/clients/admin2@org1.minvu.cl
+
+fabric-ca-client enroll -u http://admin2@org1.minvu.cl:admin2pw@localhost:7057 --csr.names "$CSR_NAMES_ORG1" --csr.hosts "admin2@org1.minvu.cl,localhost" --enrollment.profile tls
+
+./identities.sh
+
+./msp.sh
+
+./artifacts.sh
+
+
+docker-compose -f docker-compose-cli-couchdb.yaml up -d
+
+./channels.sh
+´´´
+
+
+
+Creae nuevo usuario en la organizacion 1 
+
+´´´shell
+export CSR_NAMES_ORG1="C=CL,ST=Santiago,L=Santiago,O=Org1,OU=Hyperledger Fabric"
+
+export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin
+
+fabric-ca-client register --id.name user1@org1.minvu.cl --id.secret user1pw --id.type client --id.affiliation postulacion.Mint -u http://admin:adminpw@localhost:7056
+
+export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/user1@org1.minvu.cl
+
+fabric-ca-client enroll -u http://user1@org1.minvu.cl:user1pw@localhost:7056 --csr.names "$CSR_NAMES_ORG1"
+´´´
+
+Configuración de los certificados de la RED
+Crear root CA o CA Raiz
+
+´´´shell 
+docker-compose -f docker-compose-root-ca.yaml up -d 
+´´´ 
+
+Creamos CA Intermedias a traves de los script 
+
+´´´shell 
+cd scripts/ && ./rootca.sh 
+
+docker-compose -f docker-compose-int-ca.yaml up -d 
+
+cd scripts/ && ./intca.sh 
 
 export CSR_NAMES_ORG1="C=CL,ST=Santiago,L=Santiago,O=Org1,OU=Hyperledger Fabric"
 
@@ -388,71 +493,15 @@ fabric-ca-client enroll -u http://admin2@org1.minvu.cl:admin2pw@localhost:7057 -
 
 ./artifacts.sh
 
-
 docker-compose -f docker-compose-cli-couchdb.yaml up -d
 
 ./channels.sh
 
 ´´´
 
-nuevo usuario en la organizacion 1 
-
-export CSR_NAMES_ORG1="C=CO,ST=Antioquia,L=Medellin,O=Org1,OU=Hyperledger Fabric" 
-
-export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin
-
-fabric-ca-client register --id.name user1@org1.minvu.cl --id.secret user1pw --id.type client --id.affiliation postulacion.Mint -u http://admin:adminpw@localhost:7056
-
-
-export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/user1@org1.minvu.cl
-
-fabric-ca-client enroll -u http://user1@org1.minvu.cl:user1pw@localhost:7056 --csr.names "$CSR_NAMES_ORG1"
-
-
-COFIGURACION DE CERTIFICADOS EN LA RED
-
-Crear root CA. o CA Raiz
-
-´´´shell docker-compose -f docker-compose-root-ca.yaml up -d ´´´ Creamos intermedies CA a traves de los script ´´´shell cd scripts/ && ./rootca.sh ´´´
-
-´´´shell docker-compose -f docker-compose-int-ca.yaml up -d ´´´
-
-´´´shell cd scripts/ && ./intca.sh ´´´
+Nuevo usuario en la organización 1
 
 ´´´shell
-
-export CSR_NAMES_ORG1="C=CO,ST=Antioquia,L=Medellin,O=Org1,OU=Hyperledger Fabric"
-
-export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin
-
-fabric-ca-client register --id.name admin2@org1.minvu.cl --id.secret admin2pw --id.type admin -u http://admin:adminpw@localhost:7056
-
-export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin2@org1.minvu.cl
-
-fabric-ca-client enroll -u http://admin2@org1.minvu.cl:admin2pw@localhost:7056 --csr.names "$CSR_NAMES_ORG1"
-
-export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/tls-int/clients/admin
-
-fabric-ca-client register --id.name admin2@org1.minvu.cl --id.secret admin2pw --id.type admin -u http://admin:adminpw@localhost:7057
-
-export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/tls-int/clients/admin2@org1.minvu.cl
-
-fabric-ca-client enroll -u http://admin2@org1.minvu.cl:admin2pw@localhost:7057 --csr.names "$CSR_NAMES_ORG1" --csr.hosts "admin2@org1.minvu.cl,localhost" --enrollment.profile tls
-
-./identities.sh
-
-./msp.sh
-
-./artifacts.sh
-
-docker-compose -f docker-compose-cli-couchdb.yaml up -d
-
-./channels.sh
-
-´´´
-
-nuevo usuario en la organizacion 1
-
 export CSR_NAMES_ORG1="C=CL,ST=Santiago,L=Santiago,O=Org1,OU=Hyperledger Fabric"
 
 export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/admin
@@ -463,33 +512,27 @@ export FABRIC_CA_CLIENT_HOME=../fabric-ca/org1.minvu.cl/int/clients/user1@org1.m
 
 fabric-ca-client enroll -u http://user1@org1.minvu.cl:user1pw@localhost:7056 --csr.names "$CSR_NAMES_ORG1"
 
+´´´
+****************************************************************************************
+****************************************************************************************
+INSTALAR CHAINCODE
+****************************************************************************************
+****************************************************************************************
 
 
-instalar chaincode , posicionarse dentro de 
+Instalar caliper y requisitos previos
 
-minvu-network-scripts
-
-
-openssl x509 -in ca-cert.pem -text -noout
-
-
-crear carpeta caliper.
-
-instalar caliper-cli
+´´´shell
 
 sudo apt install npm
 
-
-crear paquete json del proyecto
 npm init -y
 
 npm install --only=prod @hyperledger/caliper-cli@0.3.2
 
-
-descargar adaptar para conectarse con fabric
 npx caliper bind --caliper-bind-sut fabric:latest-v2 --caliper-bind-sdk latest-v2 --caliper-fabric-gateway-usegateway --caliper-flow-only-test
 
-
+´´´
 
 
 

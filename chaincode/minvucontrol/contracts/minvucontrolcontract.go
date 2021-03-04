@@ -45,9 +45,9 @@ func AfterTransaction(ctx CustomTransactionContextInterface, txReturnValue inter
 	return
 }
 
-// GetEvaluateTransactions returns functions of CurrencyContract not to be tagged as submit
+// GetEvaluateTransactions returns
 func (cc *MinvuControlContract) GetEvaluateTransactions() []string {
-	return []string{"GetHistoryOfUTXO", "QueryCouchDB"}
+	return []string{"GetHistoryOfPOS", "QueryCouchDB"}
 }
 
 // Inserta una nueva postulación, tarea solo para la EGR 
@@ -159,15 +159,15 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 	if ObjetoPostulacion.EstadoExpediente == "Creacion"{
 		
 
-		hasOUPermission, err := cid.HasOUValue(ctx.GetStub(),"egr")
+		hasOUPermission, errr := cid.HasOUValue(ctx.GetStub(),"egr")
 
-		if err != nil {
+		if errr != nil {
 			return
 		}
 
 		if !hasOUPermission {
-			err  = postulacion.ErrEnvioPostulacionCreacion
-			fmt.Printf(err.Error())
+			errr  = postulacion.ErrEnvioPostulacionCreacion
+			fmt.Printf(errr.Error())
 			return 
 		}
 
@@ -187,14 +187,14 @@ func (cc *MinvuControlContract) Transfer(ctx CustomTransactionContextInterface, 
 	}else if ObjetoPostulacion.EstadoExpediente == "Enviado" { 
 		
 		//SERVIU solo puede enviar expedientes en estado Enviado
-		hasOUPermission, err := cid.HasOUValue(ctx.GetStub(),"serviu")
-		if err != nil {
+		hasOUPermission, errr := cid.HasOUValue(ctx.GetStub(),"serviu")
+		if errr != nil {
 			return
 		}
 
 		if !hasOUPermission {
-			err  = postulacion.ErrEnvioPostulacionEnviado
-			fmt.Printf(err.Error())
+			errr  = postulacion.ErrEnvioPostulacionEnviado
+			fmt.Printf(errr.Error())
 			return 
 		}
 
@@ -250,7 +250,7 @@ func (cc *MinvuControlContract) Selection(ctx CustomTransactionContextInterface,
 	if estado == ""{
 		err = postulacion.ErrEstadoRequerido 
 		return
-	}else if estado != "Seleccionado" || estado != "Rechazado" {
+	}else if estado != "Seleccionado" && estado != "Rechazado" {
 		err = postulacion.ErrEstadoRequeridoNoValido
 		return
 	}
@@ -266,15 +266,15 @@ func (cc *MinvuControlContract) Selection(ctx CustomTransactionContextInterface,
 	if ObjetoPostulacion.EstadoExpediente == "Aprobado"{
 		
 		// solo dph puede beneficiar postulantes
-		hasOUPermission, err := cid.HasOUValue(ctx.GetStub(),"dph")
+		hasOUPermission, errr := cid.HasOUValue(ctx.GetStub(),"dph")
 
-		if err != nil {
+		if errr != nil {
 			return
 		}
 
 		if !hasOUPermission {
-			err = postulacion.ErrEnvioPostulacionAprobado
-			fmt.Printf(err.Error())
+			errr = postulacion.ErrEnvioPostulacionAprobado
+			fmt.Printf(errr.Error())
 			return 
 		}
 
@@ -319,7 +319,7 @@ func (cc *MinvuControlContract) Selection(ctx CustomTransactionContextInterface,
 	
 }
 
-// SetTrustline can be used to enable or disable receptions of this currency from a specific issuer
+// SetTrustline permitir transferencias entre organizaciones
 func (cc *MinvuControlContract) SetTrustline(ctx CustomTransactionContextInterface, emisor string, trust bool) (payload postulacion.TrustlineSetPayload, err error) {
 	// Validar emisor 
 	if emisor == "" {

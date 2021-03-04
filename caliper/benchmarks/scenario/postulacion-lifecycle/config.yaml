@@ -6,11 +6,11 @@ test:
     number: 3
   rounds:
     - label: Insert
-      txNumber: 10
+      txNumber: 90
       rateControl:
         type: fixed-rate
         opts:
-          tps: 25
+          tps: 5
       callback: benchmarks/callbacks/minvucontrol/postulacion/mint.js
       arguments:
         TipologiaCode: CCH
